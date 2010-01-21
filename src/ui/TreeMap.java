@@ -44,7 +44,7 @@ public class TreeMap extends Display {
 	private static final String labelElement="name";	//what will be displayed when mouseovered
 	private SearchQueryBinding searchQuery;
 	private int width=800;
-	private int height=800;
+	private int height=700;
 	
 	
 	public TreeMap(Tree t){
@@ -211,5 +211,9 @@ public class TreeMap extends Display {
 				return ColorLib.gray(50);
 			}
 		}
+	}
+	
+	public SearchQueryBinding getSearchQuery(){
+		return searchQuery;
 	}
 }
