@@ -19,28 +19,28 @@ import prefuse.util.FontLib;
 import prefuse.util.ui.*;
 import prefuse.visual.*;
 
-public class MainUI extends JFrame {
+public class MainUI extends JPanel {
 	private int width=1000;
 	private int height=900;
 	private String inputFile="E:/Users/kevin/My Documents/Aptana RadRails Workspace/Sakai/forumTree.xml";
 	
 	public MainUI(){
-		super ("o v e r h e r d | v i s u a l i z a t i o n");
+	//	super ("o v e r h e r d | v i s u a l i z a t i o n");
 		createAndShowGUI("name");
 	}
 	
 	public MainUI(int width, int height){
-		super ("o v e r h e r d | v i s u a l i z a t i o n");
+	//	super ("o v e r h e r d | v i s u a l i z a t i o n");
 		this.width=width;
 		this.height=height;
 		createAndShowGUI("name");
 	}
 	
 	public void createAndShowGUI(final String label){
-		this.setSize(width, height);
+	//	this.setSize(width, height);
 		
-		this.setVisible(true);
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	//	this.setVisible(true);
+	//	this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	
 		Tree tree=null;
 		try{
@@ -83,7 +83,7 @@ public class MainUI extends JFrame {
 		UILib.setColor(panel, Color.BLACK, Color.GRAY);
 		
 		this.setLayout(new BorderLayout());
-		this.getContentPane().add(panel, BorderLayout.CENTER);
+		this.add(panel, BorderLayout.CENTER);
 		
 		//Viewer
 		JPanel viewerPanel=new JPanel(new BorderLayout());
@@ -91,7 +91,7 @@ public class MainUI extends JFrame {
 		viewerPanel.add(new JLabel(" v i e w e r "), BorderLayout.NORTH);
 		viewerPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 		UILib.setColor(viewerPanel, Color.BLACK, Color.GRAY);
-		this.getContentPane().add(viewerPanel, BorderLayout.EAST);
+		this.add(viewerPanel, BorderLayout.EAST);
 		
 		//Controller
 		JPanel controlPanel=new JPanel();
@@ -99,13 +99,19 @@ public class MainUI extends JFrame {
 		controlPanel.add(new JLabel(" c o n t r o l l e r "), BorderLayout.NORTH);
 		controlPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		//UILib.setColor(controlPanel, Color.BLACK, Color.GRAY);
-		this.getContentPane().add(controlPanel, BorderLayout.SOUTH);
+		this.add(controlPanel, BorderLayout.SOUTH);
 	}
 	
 	public static void main(String args[]){
 		javax.swing.SwingUtilities.invokeLater(new Runnable(){
 			public void run(){
 				MainUI ui=new MainUI();
+				JFrame frame=new JFrame(" o v e r h e r d | v i s u a l i z a t i o n ");
+				frame.setSize(1100, 800);
+				frame.setLayout(new BorderLayout());
+				frame.getContentPane().add(ui);
+				frame.setVisible(true);
+				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			}
 		});
 	}
