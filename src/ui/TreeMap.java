@@ -41,44 +41,60 @@ public class TreeMap extends Display {
 	private static final String nodes="tree.nodes";
 	private static final String edges="tree.edges";
 	private static final String labels="labels";
-	private static final String labelElement="name";	//what will be displayed when mouseovered
+//	private static final String label="name";	//what will be displayed when mouseovered
 	private SearchQueryBinding searchQuery;
 	private int width=800;
 	private int height=700;
 	
-	
-	public TreeMap(Tree t){
-		super(new Visualization());
-		setup(t);
+	private static final Schema LABEL_SCHEMA=PrefuseLib.getVisualItemSchema();
+	static{
+		LABEL_SCHEMA.setDefault(VisualItem.INTERACTIVE, false);
+		LABEL_SCHEMA.setDefault(VisualItem.TEXTCOLOR, ColorLib.gray(200));
+		LABEL_SCHEMA.setDefault(VisualItem.FONT, FontLib.getFont("Tahoma", 16));
 	}
 	
-	public TreeMap(Tree t, int width, int height){
+	
+	public TreeMap(Tree t, String label){
+		super(new Visualization());
+		setup(t, label);
+	}
+	
+	public TreeMap(Tree t,String label, int width, int height){
 		super(new Visualization());
 		this.width=width;
 		this.height=height;
-		setup(t);
+		setup(t, label);
 	}
 	
-	public void setup(Tree t){
+	public void setup(Tree t, String label){
 		//m_vis the the initalized Visualization
 		VisualTree vt=m_vis.addTree(tree, t);
+		m_vis.setVisible(edges, null, false);
 		
 		//only leaf nodes are interactive
-		m_vis.setInteractive(edges, (Predicate)ExpressionParser.parse("childcount()>0"), false);
+		m_vis.setInteractive(nodes, (Predicate)ExpressionParser.parse("childcount()>0"), false);
+		m_vis.addDecorators(labels,nodes,(Predicate)ExpressionParser.parse("treedepth()=0"), LABEL_SCHEMA);
 		
 		//set up default render factory for nodes and edges
 		DefaultRendererFactory rf=new DefaultRendererFactory();
 		//use a customized NodeRenderer to render a node as a rectangle
 		rf.add(new InGroupPredicate(nodes), new NodeRenderer());
-		rf.add(new InGroupPredicate(edges), new LabelRenderer(labelElement));
+		rf.add(new InGroupPredicate(edges), new LabelRenderer(label));
 		m_vis.setRendererFactory(rf);
 		
 		//set colors
 		ActionList colorActions=new ActionList();
-		colorActions.add(new FillColorAction(nodes));
 		final ColorAction borderColor=new BorderColorAction(nodes);
 		colorActions.add(borderColor);
+		colorActions.add(new FillColorAction(nodes));
+		
 		m_vis.putAction("colors", colorActions);
+		
+		//animate
+		ActionList animatePaint=new ActionList(400);
+		animatePaint.add(new ColorAnimator(nodes));
+		animatePaint.add(new RepaintAction());
+		m_vis.putAction("animatePaint", animatePaint);
 		
 		//layout
 		ActionList layoutActions=new ActionList();
@@ -102,7 +118,7 @@ public class TreeMap extends Display {
 			}
 		});
 		
-		searchQuery=new SearchQueryBinding(vt.getNodeTable(), labelElement);
+		searchQuery=new SearchQueryBinding(vt.getNodeTable(), label);
 		m_vis.addFocusGroup(Visualization.SEARCH_ITEMS, searchQuery.getSearchSet());
 		searchQuery.getPredicate().addExpressionListener(new UpdateListener(){
 			public void update(Object src){
@@ -138,13 +154,12 @@ public class TreeMap extends Display {
 	 */
 	
 	public static class LabelLayout extends Layout {
-		private String group;
 		
 		public LabelLayout(String group){
-			this.group=group;
+			super(group);
 		}
 		public void run(double num){
-			Iterator iter=m_vis.items(group);
+			Iterator iter=m_vis.items(m_group);
 			
 			while(iter.hasNext()){
 				//for each label
@@ -175,8 +190,8 @@ public class TreeMap extends Display {
 				}else{
 					if(m_vis.isInGroup(ni, Visualization.SEARCH_ITEMS)){
 						return ColorLib.rgb(191,99,130);
-					}else if(m_vis.isInGroup(ni, Visualization.SELECTED_ITEMS)){
-						return ColorLib.rgb(142, 88, 23);
+				//	}else if(m_vis.isInGroup(ni, Visualization.SELECTED_ITEMS)){
+				//		return ColorLib.rgb(142, 88, 23);
 					}else{
 						return cmap.getColor(ni.getDepth());
 					}
