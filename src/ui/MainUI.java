@@ -26,17 +26,17 @@ public class MainUI extends JFrame {
 	
 	public MainUI(){
 		super ("o v e r h e r d | v i s u a l i z a t i o n");
-		createAndShowGUI();
+		createAndShowGUI("name");
 	}
 	
 	public MainUI(int width, int height){
 		super ("o v e r h e r d | v i s u a l i z a t i o n");
 		this.width=width;
 		this.height=height;
-		createAndShowGUI();
+		createAndShowGUI("name");
 	}
 	
-	public void createAndShowGUI(){
+	public void createAndShowGUI(final String label){
 		this.setSize(width, height);
 		
 		this.setVisible(true);
@@ -50,7 +50,7 @@ public class MainUI extends JFrame {
 			System.exit(1);
 		}
 		
-		final TreeMap treemap=new TreeMap(tree);
+		final TreeMap treemap=new TreeMap(tree, label);
 		JSearchPanel searchPanel=treemap.getSearchQuery().createSearchPanel(true);
 		searchPanel.setShowResultCount(true);
 		searchPanel.setShowCancel(true);
@@ -65,11 +65,13 @@ public class MainUI extends JFrame {
 		
 		treemap.addControlListener(new ControlAdapter(){
 			public void itemEntered(VisualItem item, MouseEvent e){
-				title.setText(item.getString("name"));
+				title.setText(item.getString(label));
+				System.out.println("itemEntered:"+item.getString(label));
 			}
 			
 			public void itemExited(VisualItem item, MouseEvent e){
-				title.setText("");
+				title.setText(null);
+				System.out.println("itemExited:"+item.getString(label));
 			}
 		});
 		
