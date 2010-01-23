@@ -29,6 +29,11 @@ public class MainUI extends JPanel {
 		createAndShowGUI("name");
 	}
 	
+	public MainUI(String xmlPath){
+		inputFile=xmlPath;
+		createAndShowGUI("name");
+	}
+	
 	public MainUI(int width, int height){
 	//	super ("o v e r h e r d | v i s u a l i z a t i o n");
 		this.width=width;
@@ -63,15 +68,22 @@ public class MainUI extends JPanel {
 		title.setBorder(BorderFactory.createEmptyBorder(3, 0, 0, 0));
 		title.setFont(FontLib.getFont("Tahoma",Font.PLAIN, 16));
 		
+		final JTextPane textPane=new JTextPane();
+		
 		treemap.addControlListener(new ControlAdapter(){
 			public void itemEntered(VisualItem item, MouseEvent e){
 				title.setText(item.getString(label));
-				System.out.println("itemEntered:"+item.getString(label));
+			//	System.out.println("itemEntered:"+item.getString(label));
 			}
 			
 			public void itemExited(VisualItem item, MouseEvent e){
 				title.setText(null);
-				System.out.println("itemExited:"+item.getString(label));
+			//	System.out.println("itemExited:"+item.getString(label));
+			}
+			
+			public void itemClicked(VisualItem item, MouseEvent e){
+				textPane.setText(item.getString("message_body"));
+			//	System.out.println("itemClicked:" + item.getString("message_body"));
 			}
 		});
 		
@@ -87,14 +99,23 @@ public class MainUI extends JPanel {
 		
 		//Viewer
 		JPanel viewerPanel=new JPanel(new BorderLayout());
-		viewerPanel.setPreferredSize(new Dimension(200,700));
-		viewerPanel.add(new JLabel(" v i e w e r "), BorderLayout.NORTH);
+		viewerPanel.setPreferredSize(new Dimension(280,700));
+		viewerPanel.add(new JLabel("c o n t e n t | v i e w e r "), BorderLayout.NORTH);
+		
+		
+		textPane.setPreferredSize(new Dimension(275,675));
+		textPane.setEditable(false);
+		textPane.setText("Click on tree node to view content here.");
+		viewerPanel.add(textPane, BorderLayout.CENTER);
+	
+		
 		viewerPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 		UILib.setColor(viewerPanel, Color.BLACK, Color.GRAY);
 		this.add(viewerPanel, BorderLayout.EAST);
 		
 		//Controller
 		JPanel controlPanel=new JPanel();
+		controlPanel.setLayout(new BorderLayout());
 		controlPanel.setPreferredSize(new Dimension(1000,200));
 		controlPanel.add(new JLabel(" c o n t r o l l e r "), BorderLayout.NORTH);
 		controlPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -103,16 +124,21 @@ public class MainUI extends JPanel {
 	}
 	
 	public static void main(String args[]){
-		javax.swing.SwingUtilities.invokeLater(new Runnable(){
-			public void run(){
-				MainUI ui=new MainUI();
+		if (args.length<1){
+			System.out.println("Please specify data file path");
+			System.exit(1);
+		}else{
+	//	javax.swing.SwingUtilities.invokeLater(new Runnable(){
+	//		public void run(){
+				MainUI ui=new MainUI(args[0]);
 				JFrame frame=new JFrame(" o v e r h e r d | v i s u a l i z a t i o n ");
 				frame.setSize(1100, 800);
 				frame.setLayout(new BorderLayout());
 				frame.getContentPane().add(ui);
 				frame.setVisible(true);
 				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			}
-		});
+	//		}
+	//	});
+		}
 	}
 }
