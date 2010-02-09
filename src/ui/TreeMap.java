@@ -35,12 +35,12 @@ import java.util.*;
 
 public class TreeMap extends Display {
 	//initial input data to display.  To do: Add a function to dynamically change the input later
-	private String inputFile="E:/Users/kevin/My Documents/Aptana RadRails Workspace/Sakai/forumTree.xml";
+//	private String inputFile="E:/Users/kevin/My Documents/Aptana RadRails Workspace/Sakai/forumTree.xml";
 	
 	private static final String tree="tree";
 	private static final String nodes="tree.nodes";
 	private static final String edges="tree.edges";
-	private static final String labels="labels";
+	private static final String labels="name";
 //	private static final String label="name";	//what will be displayed when mouseovered
 	private SearchQueryBinding searchQuery;
 	private int width=800;
@@ -73,13 +73,13 @@ public class TreeMap extends Display {
 		
 		//only leaf nodes are interactive
 		m_vis.setInteractive(nodes, (Predicate)ExpressionParser.parse("childcount()>0"), false);
-		m_vis.addDecorators(labels,nodes,(Predicate)ExpressionParser.parse("treedepth()=0"), LABEL_SCHEMA);
+		m_vis.addDecorators(labels,nodes,(Predicate)ExpressionParser.parse("treedepth()==1"), LABEL_SCHEMA);
 		
 		//set up default render factory for nodes and edges
 		DefaultRendererFactory rf=new DefaultRendererFactory();
 		//use a customized NodeRenderer to render a node as a rectangle
 		rf.add(new InGroupPredicate(nodes), new NodeRenderer());
-		rf.add(new InGroupPredicate(edges), new LabelRenderer(label));
+		rf.add(new InGroupPredicate(labels), new LabelRenderer(label));
 		m_vis.setRendererFactory(rf);
 		
 		//set colors

@@ -22,7 +22,7 @@ import prefuse.visual.*;
 public class MainUI extends JPanel {
 	private int width=1000;
 	private int height=900;
-	private String inputFile="E:/Users/kevin/My Documents/Aptana RadRails Workspace/Sakai/forumTree.xml";
+	private String inputFile="D:/workspace3/Overherd/data/forumTree.xml";
 	
 	public MainUI(){
 	//	super ("o v e r h e r d | v i s u a l i z a t i o n");
@@ -82,8 +82,8 @@ public class MainUI extends JPanel {
 			}
 			
 			public void itemClicked(VisualItem item, MouseEvent e){
-				textPane.setText(item.getString("message_body"));
-			//	System.out.println("itemClicked:" + item.getString("message_body"));
+				textPane.setText(item.getString("message_body"));			
+				System.out.println("itemClicked:" + item.getString("message_body"));
 			}
 		});
 		
@@ -124,15 +124,17 @@ public class MainUI extends JPanel {
 	}
 	
 	public static void main(String args[]){
-		if (args.length<1){
-			System.out.println("Please specify data file path");
-			System.exit(1);
+		String inputFile;
+		if (args.length==1){
+			inputFile=args[0];
 		}else{
+			inputFile="D:/workspace3/Overherd/data/forumTree.xml";
+			
 	//	javax.swing.SwingUtilities.invokeLater(new Runnable(){
 	//		public void run(){
-				MainUI ui=new MainUI(args[0]);
+				MainUI ui=new MainUI(inputFile);
 				JFrame frame=new JFrame(" o v e r h e r d | v i s u a l i z a t i o n ");
-				frame.setSize(1100, 800);
+				frame.setSize(1100, 1000);
 				frame.setLayout(new BorderLayout());
 				frame.getContentPane().add(ui);
 				frame.setVisible(true);
