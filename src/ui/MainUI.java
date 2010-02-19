@@ -15,6 +15,7 @@ import javax.swing.*;
 import prefuse.controls.*;
 import prefuse.data.*;
 import prefuse.data.io.*;
+import prefuse.data.query.*;
 import prefuse.util.FontLib;
 import prefuse.util.ui.*;
 import prefuse.visual.*;
@@ -55,6 +56,10 @@ public class MainUI extends JPanel {
 			System.exit(1);
 		}
 		
+	//	if(tree!=null){
+	//		JPrefuseTree ft=new JPrefuseTree(new Tree(), label);
+	//	ft.showTreeWindow(tree, "name");
+	//	}
 		final TreeMap treemap=new TreeMap(tree, label);
 		JSearchPanel searchPanel=treemap.getSearchQuery().createSearchPanel(true);
 		searchPanel.setShowResultCount(true);
@@ -73,6 +78,16 @@ public class MainUI extends JPanel {
 		treemap.addControlListener(new ControlAdapter(){
 			public void itemEntered(VisualItem item, MouseEvent e){
 				title.setText(item.getString(label));
+				if(item.canGetString("type")){
+					String type=item.getString("type");
+					if(type.equals("topic")){
+						if (item.canGetDate("topic_date")){
+							System.out.println("Topic date: " + item.getDate("topic_date"));
+						}else{
+							System.out.println("Topic date failed: " + item.getString("topic_date"));
+						}
+					}
+				}
 			//	System.out.println("itemEntered:"+item.getString(label));
 			}
 			
@@ -82,8 +97,8 @@ public class MainUI extends JPanel {
 			}
 			
 			public void itemClicked(VisualItem item, MouseEvent e){
-				textPane.setText(item.getString("message_body"));			
-				System.out.println("itemClicked:" + item.getString("message_body"));
+				textPane.setText(item.getString("type")+":" +item.getString("message_body"));			
+				System.out.println("itemClicked:" +item.getString("type")+":"+ item.getString("message_body"));
 			}
 		});
 		
@@ -98,6 +113,7 @@ public class MainUI extends JPanel {
 		this.add(panel, BorderLayout.CENTER);
 		
 		//Viewer
+		
 		JPanel viewerPanel=new JPanel(new BorderLayout());
 		viewerPanel.setPreferredSize(new Dimension(280,700));
 		viewerPanel.add(new JLabel("c o n t e n t | v i e w e r "), BorderLayout.NORTH);
@@ -106,11 +122,13 @@ public class MainUI extends JPanel {
 		textPane.setPreferredSize(new Dimension(275,675));
 		textPane.setEditable(false);
 		textPane.setText("Click on tree node to view content here.");
-		viewerPanel.add(textPane, BorderLayout.CENTER);
+		JScrollPane viewScroll=new JScrollPane(textPane);
+		viewerPanel.add(viewScroll, BorderLayout.CENTER);
 	
 		
 		viewerPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 		UILib.setColor(viewerPanel, Color.BLACK, Color.GRAY);
+		UILib.setColor(viewScroll, Color.BLACK, Color.GRAY);
 		this.add(viewerPanel, BorderLayout.EAST);
 		
 		//Controller
@@ -121,6 +139,12 @@ public class MainUI extends JPanel {
 		controlPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		//UILib.setColor(controlPanel, Color.BLACK, Color.GRAY);
 		this.add(controlPanel, BorderLayout.SOUTH);
+		
+		//range control
+		JRangeSlider rangeSlider=treemap.getSlider();
+		controlPanel.add(rangeSlider, BorderLayout.SOUTH);
+	
+		
 	}
 	
 	public static void main(String args[]){
@@ -128,8 +152,8 @@ public class MainUI extends JPanel {
 		if (args.length==1){
 			inputFile=args[0];
 		}else{
-			inputFile="D:/workspace3/Overherd/data/forumTree.xml";
-			
+		//	inputFile="D:/workspace3/Overherd/data/forumTree5.xml";
+			inputFile="E:/Users/kevin/My Documents/Aptana RadRails Workspace/Sakai/forumTree5b.xml";
 	//	javax.swing.SwingUtilities.invokeLater(new Runnable(){
 	//		public void run(){
 				MainUI ui=new MainUI(inputFile);

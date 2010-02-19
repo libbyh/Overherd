@@ -6,6 +6,7 @@ import prefuse.*;
 import prefuse.action.*;
 import prefuse.action.animate.*;
 import prefuse.action.assignment.*;
+import prefuse.action.filter.*;
 import prefuse.action.layout.*;
 import prefuse.action.layout.graph.*;
 import prefuse.controls.*;
@@ -15,6 +16,7 @@ import prefuse.data.expression.parser.*;
 import prefuse.data.query.*;
 import prefuse.render.*;
 import prefuse.util.*;
+import prefuse.util.ui.*;
 import prefuse.visual.*;
 import prefuse.visual.expression.*;
 import prefuse.visual.sort.*;
@@ -45,12 +47,14 @@ public class TreeMap extends Display {
 	private SearchQueryBinding searchQuery;
 	private int width=800;
 	private int height=700;
+	private JRangeSlider slider;
+	private Display thisInstance;
 	
 	private static final Schema LABEL_SCHEMA=PrefuseLib.getVisualItemSchema();
 	static{
 		LABEL_SCHEMA.setDefault(VisualItem.INTERACTIVE, false);
 		LABEL_SCHEMA.setDefault(VisualItem.TEXTCOLOR, ColorLib.gray(200));
-		LABEL_SCHEMA.setDefault(VisualItem.FONT, FontLib.getFont("Tahoma", 16));
+		LABEL_SCHEMA.setDefault(VisualItem.FONT, FontLib.getFont("Tahoma", 12));
 	}
 	
 	
@@ -69,17 +73,20 @@ public class TreeMap extends Display {
 	public void setup(Tree t, String label){
 		//m_vis the the initalized Visualization
 		VisualTree vt=m_vis.addTree(tree, t);
+		thisInstance=this;
 		m_vis.setVisible(edges, null, false);
 		
 		//only leaf nodes are interactive
 		m_vis.setInteractive(nodes, (Predicate)ExpressionParser.parse("childcount()>0"), false);
+		m_vis.setInteractive(labels, null, true);
 		m_vis.addDecorators(labels,nodes,(Predicate)ExpressionParser.parse("treedepth()==1"), LABEL_SCHEMA);
 		
 		//set up default render factory for nodes and edges
 		DefaultRendererFactory rf=new DefaultRendererFactory();
 		//use a customized NodeRenderer to render a node as a rectangle
 		rf.add(new InGroupPredicate(nodes), new NodeRenderer());
-		rf.add(new InGroupPredicate(labels), new LabelRenderer(label));
+	//	rf.add(new InGroupPredicate(labels), new LabelRenderer(label));
+		rf.add(new InGroupPredicate(labels), new TopicRenderer(label));
 		m_vis.setRendererFactory(rf);
 		
 		//set colors
@@ -120,11 +127,44 @@ public class TreeMap extends Display {
 		
 		searchQuery=new SearchQueryBinding(vt.getNodeTable(), label);
 		m_vis.addFocusGroup(Visualization.SEARCH_ITEMS, searchQuery.getSearchSet());
+		
+		RangeQueryBinding rQ=new RangeQueryBinding(vt.getNodeTable(), "epoch_seconds");
+
+		AndPredicate filter=new AndPredicate(rQ.getPredicate());
+		
+		rQ.getNumberModel().setValueRange(0, 65000000, 0, 65000000);
+		
+		ActionList update=new ActionList();
+		update.add(new VisibilityFilter(nodes, filter));
+		
+		m_vis.putAction("update", update);
+		
+		UpdateListener lstnr=new UpdateListener(){
+			public void update(Object src){
+				m_vis.run("update");
+			}
+		};
+		filter.addExpressionListener(lstnr);
+		
 		searchQuery.getPredicate().addExpressionListener(new UpdateListener(){
 			public void update(Object src){
 				m_vis.cancel("animatePaint");
 				m_vis.run("colors");
 				m_vis.run("animatePaint");
+			}
+		});
+		
+		slider=rQ.createHorizontalRangeSlider();
+		slider.setThumbColor(null);
+		slider.setMinExtent(150000);
+		slider.addMouseListener(new MouseAdapter(){
+			public void mousePressed(MouseEvent e){
+				thisInstance.setHighQuality(false);
+			}
+			
+			public void mouseReleased(MouseEvent e){
+				thisInstance.setHighQuality(true);
+				thisInstance.repaint();
 			}
 		});
 		
@@ -164,8 +204,25 @@ public class TreeMap extends Display {
 			while(iter.hasNext()){
 				//for each label
 				DecoratorItem label=(DecoratorItem)iter.next();
+			/*	StringBuffer tempBuff=new StringBuffer();
+				tempBuff.append(label.getString("name"));
+				int spaceCount=0;
+				int buffLen=tempBuff.length();
+				for(int i=0; i<buffLen; i++){
+					if(tempBuff.charAt(i)==' '){
+						spaceCount++;
+					}
+					if (spaceCount==8){
+						tempBuff.insert(i, '\n');
+						break;
+					}
+				}
+				*/
+			//	System.out.println("Label:" + label.getString("name"));
 				//set its location to the center of the node it belongs to
 				VisualItem n=label.getDecoratedItem();
+				
+			//	System.out.println("Width: "+n.getBounds().getWidth());
 				this.setX(label, null, n.getBounds().getCenterX());
 				this.setY(label, null, n.getBounds().getCenterY());
 			}
@@ -223,12 +280,16 @@ public class TreeMap extends Display {
 				return ColorLib.gray(75);
 				
 			}else {
-				return ColorLib.gray(50);
+				return ColorLib.gray(65);
 			}
 		}
 	}
 	
 	public SearchQueryBinding getSearchQuery(){
 		return searchQuery;
+	}
+	
+	public JRangeSlider getSlider(){
+		return slider;
 	}
 }

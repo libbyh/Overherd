@@ -30,6 +30,7 @@ public class TopicRenderer extends LabelRenderer {
 			}
 			if (spaceCount==5){
 				tempBuff.insert(i, '\n');
+				spaceCount=0;
 				break;
 			}
 		}
