@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="D:/libraries/Processing/core.jar" sourcepath="D:/libraries/Processing/core.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/D:/processing-1.0.9/processing-1.0.9/reference/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="D:/libraries/prefuse-beta/build/prefuse.jar" sourcepath="D:/libraries/prefuse-beta/build/prefuse.src.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/D:/libraries/prefuse-beta/doc/api/prefuse/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
