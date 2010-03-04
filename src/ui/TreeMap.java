@@ -195,7 +195,7 @@ public class TreeMap extends Display {
 			
 			}
 		};
-		//filter.addExpressionListener(lstnr);
+		depthFilter.addExpressionListener(lstnr);
 		rangeDepthFilter.addExpressionListener(lstnr);
 		searchQuery.getPredicate().addExpressionListener(new UpdateListener(){
 			public void update(Object src){
@@ -219,6 +219,7 @@ public class TreeMap extends Display {
 			}
 		});
 		
+		m_vis.run("update");
 		m_vis.run("layout");
 	}
 	
@@ -268,12 +269,12 @@ public class TreeMap extends Display {
 		ArrayList list=depthFilter.getPredicateList();
 		
 		int size=list.size();
-		System.out.println("predicate list size: "+size);
+	//	System.out.println("predicate list size: "+size);
 		for (int i=0; i<size; i++){
 			Predicate o=(Predicate)list.get(i);
-			System.out.println(o.toString());
+		//	System.out.println(o.toString());
 			if(o.toString().equals(p.toString())){
-				System.out.println("found equals!");
+		//		System.out.println("found equals!");
 				return list.remove(o);
 			}
 		}

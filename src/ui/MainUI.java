@@ -24,6 +24,7 @@ public class MainUI extends JPanel {
 	private int width=1000;
 	private int height=900;
 	private String inputFile="D:/workspace3/Overherd/data/forumTree.xml";
+	protected JLabel rangeLabel;
 	
 	public MainUI(){
 	//	super ("o v e r h e r d | v i s u a l i z a t i o n");
@@ -98,8 +99,34 @@ public class MainUI extends JPanel {
 			}
 			
 			public void itemClicked(VisualItem item, MouseEvent e){
-				textPane.setText(item.getString("type")+":" +item.getString("message_body"));			
-				System.out.println("itemClicked:" +item.getString("type")+":"+ item.getString("message_body"));
+				StringBuffer buffer=new StringBuffer();
+				if(item.getString("type").equals("forum")){
+				//	buffer.append(item.getString("))
+				}else if(item.getString("type").equals("topic")){
+					
+				}else if(item.getString("type").equals("message")){
+					buffer.append("Post id: ");
+					buffer.append(item.getString("message_id"));
+					buffer.append("\n");
+					
+					buffer.append("Title: ");
+					buffer.append(item.getString("message_title"));
+					buffer.append("\n");
+					
+					buffer.append("User: ");
+					buffer.append(item.getString("message_author"));
+					buffer.append("\n");
+					
+					buffer.append("Date: ");
+					buffer.append(item.getString("message_date"));
+					buffer.append("\n---------------------------------------------------------------\n");
+					
+			//	buffer.append("Text: ");
+					buffer.append(item.getString("message_body"));
+				}
+				
+				textPane.setText(buffer.toString());			
+			//	System.out.println("itemClicked:" +item.getString("type")+":"+ item.getString("message_body"));
 			}
 		});
 		
@@ -141,9 +168,22 @@ public class MainUI extends JPanel {
 		//UILib.setColor(controlPanel, Color.BLACK, Color.GRAY);
 		this.add(controlPanel, BorderLayout.SOUTH);
 		
+		//chart
+		JPanel cPanel=new JPanel();
+		cPanel.setPreferredSize(new Dimension(800,50));
+		
 		//range control
 		JRangeSlider rangeSlider=treemap.getSlider();
-		controlPanel.add(rangeSlider, BorderLayout.CENTER);
+		
+		Box cBox=new Box(BoxLayout.Y_AXIS);
+		cBox.add(cPanel);
+		rangeLabel=new JLabel("  Slide thumbs to change the date range.");
+			//	+ rangeSlider.getLowValue() + " - " + rangeSlider.getHighValue());
+		rangeLabel.setHorizontalAlignment(SwingConstants.LEFT);
+		rangeLabel.setVerticalAlignment(SwingConstants.BOTTOM);
+		cBox.add(rangeLabel);
+		cBox.add(rangeSlider);
+		controlPanel.add(cBox, BorderLayout.CENTER);
 		
 		//select control
 		Box sBox=new Box(BoxLayout.Y_AXIS);
@@ -155,7 +195,7 @@ public class MainUI extends JPanel {
 		
 		int maxDepth=treemap.getMaxDepth();
 		System.out.println("max depth of tree: "+maxDepth);
-		for(int i=0; i<maxDepth; i++){
+		for(int i=1; i<maxDepth; i++){
 			final JCheckBox cB =new JCheckBox("Depth "+i);
 			cB.setName(i+"");
 			cB.setSelected(true);
@@ -164,13 +204,15 @@ public class MainUI extends JPanel {
 					int depth=Integer.parseInt(((JCheckBox)e.getSource()).getName());
 					if(cB.isSelected()){//if
 						
-						System.out.println("Selected "+ depth);
+					//	System.out.println("Selected "+ depth);
 						treemap.addDepthPredicate(depth);
-						System.out.println(treemap.getDepthPredicates().size());
+					//	System.out.println(treemap.getDepthPredicates().size());
 					}else{
-						System.out.println("unselected "+ depth);
+					//	System.out.println("unselected "+ depth);
 						treemap.removeDepthPredicate(depth);
-						System.out.println(treemap.getDepthPredicates().size());
+						treemap.getVisualization().run("update");
+						treemap.getVisualization().run("layout");
+					//	System.out.println(treemap.getDepthPredicates().size());
 					}
 				}
 			});
