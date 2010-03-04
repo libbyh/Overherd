@@ -67,6 +67,7 @@ public class MainUI extends JPanel {
 		searchPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 4, 0));
 		searchPanel.setFont(FontLib.getFont("Tahoma",Font.PLAIN, 11));
 		
+		
 		final JFastLabel title=new JFastLabel("               ");
 		title.setPreferredSize(new Dimension(350,20));
 		title.setVerticalAlignment(SwingConstants.BOTTOM);
@@ -142,7 +143,40 @@ public class MainUI extends JPanel {
 		
 		//range control
 		JRangeSlider rangeSlider=treemap.getSlider();
-		controlPanel.add(rangeSlider, BorderLayout.SOUTH);
+		controlPanel.add(rangeSlider, BorderLayout.CENTER);
+		
+		//select control
+		Box sBox=new Box(BoxLayout.Y_AXIS);
+		JScrollPane dScroll=new JScrollPane(sBox);
+		dScroll.setPreferredSize(new Dimension(130,200));
+		JLabel dLabel=new JLabel("Select depth display");
+		dLabel.setToolTipText("Select the node depths to display.");
+		sBox.add(dLabel);
+		
+		int maxDepth=treemap.getMaxDepth();
+		System.out.println("max depth of tree: "+maxDepth);
+		for(int i=0; i<maxDepth; i++){
+			final JCheckBox cB =new JCheckBox("Depth "+i);
+			cB.setName(i+"");
+			cB.setSelected(true);
+			cB.addItemListener(new ItemListener(){
+				public void itemStateChanged(ItemEvent e){
+					int depth=Integer.parseInt(((JCheckBox)e.getSource()).getName());
+					if(cB.isSelected()){//if
+						
+						System.out.println("Selected "+ depth);
+						treemap.addDepthPredicate(depth);
+						System.out.println(treemap.getDepthPredicates().size());
+					}else{
+						System.out.println("unselected "+ depth);
+						treemap.removeDepthPredicate(depth);
+						System.out.println(treemap.getDepthPredicates().size());
+					}
+				}
+			});
+			sBox.add(cB);
+		}
+		controlPanel.add(dScroll, BorderLayout.EAST);
 	
 		
 	}

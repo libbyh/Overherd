@@ -54,6 +54,9 @@ public class TreeMap extends Display {
 	private int height=700;
 	private JRangeSlider slider;
 	private Display thisInstance;
+	private MyOrPredicate depthFilter=null;
+	
+	private int maxDepth=0;
 	
 	private static final Schema LABEL_SCHEMA=PrefuseLib.getVisualItemSchema();
 	static{
@@ -139,7 +142,9 @@ public class TreeMap extends Display {
 		System.out.println("max num:"+rQ.getNumberModel().getMaximum());
 		System.out.println("min num:"+rQ.getNumberModel().getMinimum());
 		
+		//set max depth and min and max epoch
 		Iterator iter =m_vis.items(nodes);
+		
 		long max=0;
 		long min=Long.MAX_VALUE;
 		VisualItem item=null;
@@ -153,6 +158,10 @@ public class TreeMap extends Display {
 			if(num<min && num!=0){
 				min=num;
 			}
+			int tempDepth=((NodeItem)item).getDepth();
+			if( tempDepth > maxDepth){
+				maxDepth=tempDepth;
+			}
 		}
 		System.out.println("min: " + min);
 		System.out.println("max: " + max);
@@ -160,7 +169,22 @@ public class TreeMap extends Display {
 	//	filter.add(rQ.getPredicate());
 		
 		ActionList update=new ActionList();
-		update.add(new VisibilityFilter(nodes, rQ.getPredicate()));
+		
+		depthFilter=new MyOrPredicate();
+		
+		AndPredicate rangeDepthFilter=new AndPredicate();
+		rangeDepthFilter.add(depthFilter);
+		rangeDepthFilter.add(rQ.getPredicate());
+		
+		update.add(new VisibilityFilter(nodes, rangeDepthFilter));//rQ.getPredicate()));
+		
+		//depth predicates for selecting nodes at certain depth
+		//initially all depths selected, so need to be added to the filter
+		for(int i=0; i<maxDepth; i++){
+			addDepthPredicate(i);
+		}
+		
+	//	System.out.println("predicate num: "+depthPredicates.size());
 		
 		m_vis.putAction("update", update);
 		
@@ -171,8 +195,8 @@ public class TreeMap extends Display {
 			
 			}
 		};
-		filter.addExpressionListener(lstnr);
-		
+		//filter.addExpressionListener(lstnr);
+		rangeDepthFilter.addExpressionListener(lstnr);
 		searchQuery.getPredicate().addExpressionListener(new UpdateListener(){
 			public void update(Object src){
 				m_vis.cancel("animatePaint");
@@ -209,5 +233,50 @@ public class TreeMap extends Display {
 	
 	public void temp(){
 		
+	}
+	
+	/**
+	 * Returns max depth of the nodes
+	 */
+	public int getMaxDepth(){
+		return maxDepth;
+	}
+	
+	/**
+	 * Returns depth predicates
+	 */
+	public OrPredicate getDepthPredicates(){
+		return depthFilter;
+	}
+	
+	/**
+	 * 
+	 * @param depth The depth for which to add a predicate
+	 */
+	public void addDepthPredicate(int depth){
+		Predicate p=(Predicate)ExpressionParser.parse("treedepth()="+depth);	
+		depthFilter.add(p);
+	}
+	
+	/**
+	 * 
+	 * @param depth The depth for which to remove the predicate 
+	 * @return whether the removal was successful.
+	 */
+	public boolean removeDepthPredicate(int depth){
+		Predicate p=(Predicate)ExpressionParser.parse("treedepth()="+depth);
+		ArrayList list=depthFilter.getPredicateList();
+		
+		int size=list.size();
+		System.out.println("predicate list size: "+size);
+		for (int i=0; i<size; i++){
+			Predicate o=(Predicate)list.get(i);
+			System.out.println(o.toString());
+			if(o.toString().equals(p.toString())){
+				System.out.println("found equals!");
+				return list.remove(o);
+			}
+		}
+		return false;
 	}
 }
