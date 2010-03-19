@@ -87,13 +87,12 @@ public class TreeMap extends Display {
 		//only leaf nodes are interactive
 		m_vis.setInteractive(nodes, (Predicate)ExpressionParser.parse("childcount()>0"), false);
 		m_vis.setInteractive(labels, null, true);
-		m_vis.addDecorators(labels,nodes,(Predicate)ExpressionParser.parse("treedepth()==1"), LABEL_SCHEMA);
+		m_vis.addDecorators(labels,nodes,(Predicate)ExpressionParser.parse("treedepth()==2"), LABEL_SCHEMA);
 		
 		//set up default render factory for nodes and edges
 		DefaultRendererFactory rf=new DefaultRendererFactory();
 		//use a customized NodeRenderer to render a node as a rectangle
 		rf.add(new InGroupPredicate(nodes), new NodeRenderer());
-	//	rf.add(new InGroupPredicate(labels), new LabelRenderer(label));
 		rf.add(new InGroupPredicate(labels), new TopicRenderer(label));
 		m_vis.setRendererFactory(rf);
 		

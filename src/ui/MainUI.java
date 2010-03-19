@@ -8,6 +8,8 @@ package ui;
  * It has three components.  1) the treemap display 2) viewer for content 3) controller
  */
 
+import viz.chart.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -22,7 +24,7 @@ import prefuse.visual.*;
 
 public class MainUI extends JPanel {
 	private int width=1000;
-	private int height=900;
+	private int height=1900;
 	private String inputFile="D:/workspace3/Overherd/data/forumTree.xml";
 	protected JLabel rangeLabel;
 	
@@ -172,6 +174,11 @@ public class MainUI extends JPanel {
 		JPanel cPanel=new JPanel();
 		cPanel.setPreferredSize(new Dimension(800,50));
 		
+		TimeChart chart=new TimeChart("Test", treemap);
+		chart.setPreferredSize(new Dimension(700,50));
+		chart.setMaximumSize(new Dimension(700,50));
+		chart.setMaximizedBounds(new Rectangle(0,0,700,50));
+	//	controlPanel.add(chart.getChartPanel(),BorderLayout.NORTH);
 		//range control
 		JRangeSlider rangeSlider=treemap.getSlider();
 		
@@ -181,6 +188,8 @@ public class MainUI extends JPanel {
 			//	+ rangeSlider.getLowValue() + " - " + rangeSlider.getHighValue());
 		rangeLabel.setHorizontalAlignment(SwingConstants.LEFT);
 		rangeLabel.setVerticalAlignment(SwingConstants.BOTTOM);
+		
+		cBox.add(chart.getChartPanel());
 		cBox.add(rangeLabel);
 		cBox.add(rangeSlider);
 		controlPanel.add(cBox, BorderLayout.CENTER);
@@ -219,7 +228,8 @@ public class MainUI extends JPanel {
 			sBox.add(cB);
 		}
 		controlPanel.add(dScroll, BorderLayout.EAST);
-	
+		
+		
 		
 	}
 	
@@ -235,6 +245,7 @@ public class MainUI extends JPanel {
 				MainUI ui=new MainUI(inputFile);
 				JFrame frame=new JFrame(" o v e r h e r d | v i s u a l i z a t i o n ");
 				frame.setSize(1100, 1000);
+		//		frame.pack();
 				frame.setLayout(new BorderLayout());
 				frame.getContentPane().add(ui);
 				frame.setVisible(true);
