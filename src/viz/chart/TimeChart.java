@@ -123,7 +123,7 @@ public class TimeChart extends ApplicationFrame {
 				//	System.out.println("Cal: "+c.toString());
 					String key=c.get(Calendar.DAY_OF_MONTH) + " " + 
 					(c.get(Calendar.MONTH)) + " " + c.get(Calendar.YEAR);
-					System.out.println("converted key: "+ time + ", "+key);
+				//	System.out.println("converted key: "+ time + ", "+key);
 				//	String ds=df.format(date);
 				//	System.out.println("date:"+ds);
 					if(dateHash.containsKey(key)){
@@ -136,7 +136,7 @@ public class TimeChart extends ApplicationFrame {
 			
 			for (String key : dateHash.keySet()){
 				int num=dateHash.get(key);
-				System.out.println(key + " : " + dateHash.get(key));
+			//	System.out.println(key + " : " + dateHash.get(key));
 				Calendar c=Calendar.getInstance();
 				String[] data=key.split("\\s");
 				c.set(Integer.parseInt(data[2]), (Integer.parseInt(data[1])),
@@ -147,10 +147,10 @@ public class TimeChart extends ApplicationFrame {
 			//	}catch(ParseException pe){
 			//		pe.printStackTrace();
 			//	}
-				System.out.println("adding " + c.get(Calendar.DATE) + " "+
-						(c.get(Calendar.MONTH)+1) +" " + c.get(Calendar.YEAR));
-				ts.add(new Day(c.get(Calendar.DATE), (c.get(Calendar.MONTH)+1), c.get(Calendar.YEAR)),
-						num);
+			//	System.out.println("adding " + c.get(Calendar.DATE) + " "+
+			//			(c.get(Calendar.MONTH)+1) +" " + c.get(Calendar.YEAR));
+			//	ts.add(new Day(c.get(Calendar.DATE), (c.get(Calendar.MONTH)+1), c.get(Calendar.YEAR)),
+			//			num);
 			//
 				
 			}

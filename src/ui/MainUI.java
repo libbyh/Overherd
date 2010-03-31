@@ -22,11 +22,14 @@ import prefuse.util.FontLib;
 import prefuse.util.ui.*;
 import prefuse.visual.*;
 
+import viz.control.*;
+
 public class MainUI extends JPanel {
 	private int width=1000;
 	private int height=1900;
 	private String inputFile="D:/workspace3/Overherd/data/forumTree.xml";
 	protected JLabel rangeLabel;
+	private JTextPane textPane=new JTextPane();
 	
 	public MainUI(){
 	//	super ("o v e r h e r d | v i s u a l i z a t i o n");
@@ -64,6 +67,7 @@ public class MainUI extends JPanel {
 	//	ft.showTreeWindow(tree, "name");
 	//	}
 		final TreeMap treemap=new TreeMap(tree, label);
+		treemap.associatedMainUI=this;
 		JSearchPanel searchPanel=treemap.getSearchQuery().createSearchPanel(true);
 		searchPanel.setShowResultCount(true);
 		searchPanel.setShowCancel(true);
@@ -77,60 +81,9 @@ public class MainUI extends JPanel {
 		title.setBorder(BorderFactory.createEmptyBorder(3, 0, 0, 0));
 		title.setFont(FontLib.getFont("Tahoma",Font.PLAIN, 16));
 		
-		final JTextPane textPane=new JTextPane();
 		
-		treemap.addControlListener(new ControlAdapter(){
-			public void itemEntered(VisualItem item, MouseEvent e){
-				title.setText(item.getString(label));
-				if(item.canGetString("type")){
-					String type=item.getString("type");
-					if(type.equals("topic")){
-						if (item.canGetDate("topic_date")){
-							System.out.println("Topic date: " + item.getDate("topic_date"));
-						}else{
-							System.out.println("Topic date failed: " + item.getString("topic_date"));
-						}
-					}
-				}
-			//	System.out.println("itemEntered:"+item.getString(label));
-			}
-			
-			public void itemExited(VisualItem item, MouseEvent e){
-				title.setText(null);
-			//	System.out.println("itemExited:"+item.getString(label));
-			}
-			
-			public void itemClicked(VisualItem item, MouseEvent e){
-				StringBuffer buffer=new StringBuffer();
-				if(item.getString("type").equals("forum")){
-				//	buffer.append(item.getString("))
-				}else if(item.getString("type").equals("topic")){
-					
-				}else if(item.getString("type").equals("message")){
-					buffer.append("Post id: ");
-					buffer.append(item.getString("message_id"));
-					buffer.append("\n");
-					
-					buffer.append("Title: ");
-					buffer.append(item.getString("message_title"));
-					buffer.append("\n");
-					
-					buffer.append("User: ");
-					buffer.append(item.getString("message_author"));
-					buffer.append("\n");
-					
-					buffer.append("Date: ");
-					buffer.append(item.getString("message_date"));
-					buffer.append("\n---------------------------------------------------------------\n");
-					
-			//	buffer.append("Text: ");
-					buffer.append(item.getString("message_body"));
-				}
-				
-				textPane.setText(buffer.toString());			
-			//	System.out.println("itemClicked:" +item.getString("type")+":"+ item.getString("message_body"));
-			}
-		});
+		
+		treemap.addControlListener(new MyNodeControl(this));
 		
 		Box box=UILib.getBox(new Component[]{title,searchPanel},true, 10, 3, 0);
 		
@@ -231,6 +184,10 @@ public class MainUI extends JPanel {
 		
 		
 		
+	}
+	
+	public JTextPane getViewerTextPane(){
+		return this.textPane;
 	}
 	
 	public static void main(String args[]){

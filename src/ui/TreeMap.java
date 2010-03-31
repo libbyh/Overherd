@@ -37,7 +37,6 @@ import java.util.*;
  * 
  * @author <a href="http://kevinnam.com">kevin nam</a> 
  * 
- * @version 0.1
  */
 
 public class TreeMap extends Display {
@@ -55,6 +54,7 @@ public class TreeMap extends Display {
 	private JRangeSlider slider;
 	private Display thisInstance;
 	private MyOrPredicate depthFilter=null;
+	public MainUI associatedMainUI;
 	
 	private int maxDepth=0;
 	
@@ -94,13 +94,15 @@ public class TreeMap extends Display {
 		//use a customized NodeRenderer to render a node as a rectangle
 		rf.add(new InGroupPredicate(nodes), new NodeRenderer());
 		rf.add(new InGroupPredicate(labels), new TopicRenderer(label));
+		rf.add(new InGroupPredicate(edges), new EdgeRenderer());
 		m_vis.setRendererFactory(rf);
 		
 		//set colors
 		ActionList colorActions=new ActionList();
 		final ColorAction borderColor=new BorderColorAction(nodes);
 		colorActions.add(borderColor);
-		colorActions.add(new FillColorAction(nodes));
+		final FillColorAction fillcolor=new FillColorAction(nodes);
+		colorActions.add(fillcolor);
 		
 		m_vis.putAction("colors", colorActions);
 		
@@ -123,14 +125,33 @@ public class TreeMap extends Display {
 		addControlListener(new ControlAdapter(){
 			public void itemEntered(VisualItem item, MouseEvent e){
 				item.setStrokeColor(borderColor.getColor(item));
+				item.setHighlighted(true);
+				item.setFillColor(fillcolor.getColor(item));
 				item.getVisualization().repaint();
+				NodeItem nitem=(NodeItem)item;
+				Iterator iter=nitem.edges();
+			//	while(iter.hasNext()){
+			//		EdgeItem eitem=(EdgeItem)iter.next();
+					//System.out.println(eitem);
+			//		NodeItem sibling=eitem.getAdjacentItem(nitem);
+			//		System.out.println(sibling);
+			//		sibling.setHighlighted(true);
+			//		sibling.getVisualization().repaint();
+			//	}
 			}
 			
 			public void itemExited(VisualItem item, MouseEvent e){
 				item.setStrokeColor(item.getEndStrokeColor());
+				item.setHighlighted(false);
+				item.setFillColor(fillcolor.getColor(item));
 				item.getVisualization().repaint();
 			}
 		});
+		
+		this.addControlListener(new NeighborHighlightControl());
+		this.addControlListener(new MyWheelNaviControl(this.associatedMainUI));
+	//	this.addControlListener(new WheelZoomControl());
+		
 		
 		searchQuery=new SearchQueryBinding(vt.getNodeTable(), label);
 		m_vis.addFocusGroup(Visualization.SEARCH_ITEMS, searchQuery.getSearchSet());
@@ -150,7 +171,7 @@ public class TreeMap extends Display {
 		while(iter.hasNext()){
 			item=(VisualItem)iter.next();
 			long num=item.getLong("epoch_seconds");
-			System.out.println("epoch: " + num);
+		//	System.out.println("epoch: " + num);
 			if(num>max){
 				max=num;
 			}
@@ -164,6 +185,8 @@ public class TreeMap extends Display {
 		}
 		System.out.println("min: " + min);
 		System.out.println("max: " + max);
+		min-=1000;
+		max+=1000;
 		rQ.getNumberModel().setValueRange(min, max, min, max);
 	//	filter.add(rQ.getPredicate());
 		
@@ -179,6 +202,7 @@ public class TreeMap extends Display {
 		
 		//depth predicates for selecting nodes at certain depth
 		//initially all depths selected, so need to be added to the filter
+		maxDepth+=1;
 		for(int i=0; i<maxDepth; i++){
 			addDepthPredicate(i);
 		}

@@ -22,19 +22,28 @@ public class FillColorAction extends ColorAction {
 	public int getColor(VisualItem item){
 		if(item instanceof NodeItem){
 			NodeItem ni=(NodeItem)item;
-			if(ni.getChildCount()>0){
+			if(ni.getChildCount()>0 && !ni.isHighlighted()){
+			//	System.out.println("node with children");
+			//	return ColorLib.rgba(255, 153, 51, 50);
 				return 0;
 			}else{
-				if(m_vis.isInGroup(ni, Visualization.SEARCH_ITEMS)){
+				if(item.isInGroup(Visualization.SEARCH_ITEMS)){
+					System.out.println("search");
 					return ColorLib.rgb(191,99,130);
 			//	}else if(m_vis.isInGroup(ni, Visualization.SELECTED_ITEMS)){
 			//		return ColorLib.rgb(142, 88, 23);
+				}else if(item.isInGroup(Visualization.FOCUS_ITEMS)){
+					System.out.println("highlight");
+					return ColorLib.rgb(255,200,125);
+				}else if(item.isHighlighted()){
+					return ColorLib.rgb(255, 100, 100);
 				}else{
 					return cmap.getColor(ni.getDepth());
 				}
 			}
-		}else{
+		}else{	//edge?
 			return cmap.getColor(0);
+		//	return ColorLib.rgb(100, 100, 100);
 		}
 	}
 }

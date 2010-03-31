@@ -21,10 +21,12 @@ public class BorderColorAction extends ColorAction {
 			return ColorLib.rgb(99, 130, 191);
 		}
 		int depth=ni.getDepth();
-		if(depth<2){
-			return ColorLib.gray(100);
-		}else if(depth<4){
-			return ColorLib.gray(75);
+		if(depth==1){
+			return ColorLib.gray(200);
+		}else if(depth==2){
+			return ColorLib.gray(140);//.rgb(255,0,102);
+		}else if(depth==3){
+			return ColorLib.gray(100);//rgb(120,255,0);
 			
 		}else {
 			return ColorLib.gray(65);
