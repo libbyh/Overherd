@@ -147,10 +147,10 @@ public class TimeChart extends ApplicationFrame {
 			//	}catch(ParseException pe){
 			//		pe.printStackTrace();
 			//	}
-			//	System.out.println("adding " + c.get(Calendar.DATE) + " "+
-			//			(c.get(Calendar.MONTH)+1) +" " + c.get(Calendar.YEAR));
-			//	ts.add(new Day(c.get(Calendar.DATE), (c.get(Calendar.MONTH)+1), c.get(Calendar.YEAR)),
-			//			num);
+				System.out.println("adding " + c.get(Calendar.DATE) + " "+
+						(c.get(Calendar.MONTH)+1) +" " + c.get(Calendar.YEAR));
+				ts.add(new Day(c.get(Calendar.DATE), (c.get(Calendar.MONTH)+1), c.get(Calendar.YEAR)),
+						num);
 			//
 				
 			}

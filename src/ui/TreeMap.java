@@ -185,8 +185,8 @@ public class TreeMap extends Display {
 		}
 		System.out.println("min: " + min);
 		System.out.println("max: " + max);
-		min-=1000;
-		max+=1000;
+	//	min-=1000;
+	//	max+=1000;
 		rQ.getNumberModel().setValueRange(min, max, min, max);
 	//	filter.add(rQ.getPredicate());
 		
