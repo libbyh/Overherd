@@ -27,7 +27,7 @@ import viz.control.*;
 public class MainUI extends JPanel {
 	private int width=1000;
 	private int height=1900;
-	private String inputFile="D:/workspace3/Overherd/data/forumTree.xml";
+	private String inputFile="";//"D:/workspace3/Overherd/data/forumTree.xml";
 	protected JLabel rangeLabel;
 	private JTextPane textPane=new JTextPane();
 	
@@ -84,6 +84,7 @@ public class MainUI extends JPanel {
 		
 		
 		treemap.addControlListener(new MyNodeControl(this));
+		treemap.addControlListener(new MyWheelNaviControl(this));
 		
 		Box box=UILib.getBox(new Component[]{title,searchPanel},true, 10, 3, 0);
 		

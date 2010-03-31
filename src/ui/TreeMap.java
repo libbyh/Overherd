@@ -148,8 +148,8 @@ public class TreeMap extends Display {
 			}
 		});
 		
-		this.addControlListener(new NeighborHighlightControl());
-		this.addControlListener(new MyWheelNaviControl(this.associatedMainUI));
+	//	this.addControlListener(new NeighborHighlightControl());
+	//	this.addControlListener(new MyWheelNaviControl(this.associatedMainUI));
 	//	this.addControlListener(new WheelZoomControl());
 		
 		

@@ -18,11 +18,12 @@ public class MyWheelNaviControl extends ControlAdapter {
     private VisualItem previousInvokingItem=null;
     
     private MainUI associatedMainUI=null;
- //   private JTextPane associatedViewerPane=null;
+    private JTextPane associatedViewerPane=null;
     
     public MyWheelNaviControl(MainUI ui){
     	this.associatedMainUI=ui;
-    //	this.associatedViewerPane=ui.getViewerTextPane();
+    	assert associatedMainUI!=null;
+    	this.associatedViewerPane=ui.getViewerTextPane();
     }
     
 	/**
@@ -36,7 +37,7 @@ public class MyWheelNaviControl extends ControlAdapter {
         
         if(e.getWheelRotation()>0){
         	 if(previousInvokingItem!=null){
-             	if(!previousInvokingItem.isHover()){
+             //	if(!previousInvokingItem.isHover()){
              		if(currentParentItem!=null){
                      	currentParentItem.setHighlighted(false);
                      	currentParentItem.getVisualization().repaint();
@@ -68,10 +69,14 @@ public class MyWheelNaviControl extends ControlAdapter {
                  	//	buffer.append("Text: ");
                  			buffer.append(currentParentItem.getString("message_body"));
                  		}
-                 		if(this.associatedMainUI!=null)
-                 			this.associatedMainUI.getViewerTextPane().setText(buffer.toString());			
+                 		if(associatedMainUI==null){
+                 			System.out.println("Mainui is null?!?");
+                 		}else if(associatedMainUI.getViewerTextPane()==null){
+                 			System.out.println("text viewer is null?!?");
+                 		}
+                 		associatedMainUI.getViewerTextPane().setText(buffer.toString());			
                      }
-             	}
+           //  	}
              }
              previousInvokingItem=item;
              
@@ -83,9 +88,57 @@ public class MyWheelNaviControl extends ControlAdapter {
              parentItem.getVisualization().repaint();
              parentItem.getVisualization().run("colors");
         }else{
-        	currentParentItem.setHighlighted(false);
-        	currentParentItem.getVisualization().repaint();
-            currentParentItem.getVisualization().run("colors");
+        	
+        	if(currentParentItem != null){
+	        	currentParentItem.setHighlighted(false);
+	        	currentParentItem.getVisualization().repaint();
+	            currentParentItem.getVisualization().run("colors");
+	            
+	            
+        	}
+        	
+        	if(previousInvokingItem!=null){
+        		if(previousInvokingItem.isHover()){
+             		
+        			previousInvokingItem.setHighlighted(false);
+        			previousInvokingItem.getVisualization().repaint();
+        			previousInvokingItem.getVisualization().run("colors");
+                    StringBuffer buffer=new StringBuffer();
+                    
+             		if(previousInvokingItem.getString("type").equals("forum")){
+             		//	buffer.append(item.getString("))
+             		//	this.associatedMainUI.getViewerTextPane().setText("this is of type forum");
+             		}else if(previousInvokingItem.getString("type").equals("topic")){
+             		//	this.associatedMainUI.getViewerTextPane().setText("this is of type topic");
+             		}else if(previousInvokingItem.getString("type").equals("message")){
+             			buffer.append("Post id: ");
+             			buffer.append(previousInvokingItem.getString("message_id"));
+             			buffer.append("\n");
+             			
+             			buffer.append("Title: ");
+             			buffer.append(previousInvokingItem.getString("message_title"));
+             			buffer.append("\n");
+             			
+             			buffer.append("User: ");
+             			buffer.append(previousInvokingItem.getString("message_author"));
+             			buffer.append("\n");
+             			
+             			buffer.append("Date: ");
+             			buffer.append(previousInvokingItem.getString("message_date"));
+             			buffer.append("\n---------------------------------------------------------------\n");
+             			
+             	//	buffer.append("Text: ");
+             			buffer.append(previousInvokingItem.getString("message_body"));
+             		}
+             		if(associatedMainUI==null){
+             			System.out.println("Mainui is null?!?");
+             		}else if(associatedMainUI.getViewerTextPane()==null){
+             			System.out.println("text viewer is null?!?");
+             		}
+             		associatedMainUI.getViewerTextPane().setText(buffer.toString());			
+                 }
+             	
+        	}
         }
         
        
