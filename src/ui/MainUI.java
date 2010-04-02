@@ -21,6 +21,7 @@ import prefuse.data.query.*;
 import prefuse.util.FontLib;
 import prefuse.util.ui.*;
 import prefuse.visual.*;
+import registry.ComponentRegistry;
 
 import viz.control.*;
 
@@ -81,12 +82,26 @@ public class MainUI extends JPanel {
 		title.setBorder(BorderFactory.createEmptyBorder(3, 0, 0, 0));
 		title.setFont(FontLib.getFont("Tahoma",Font.PLAIN, 16));
 		
+		JButton authorTopicViewButton=new JButton("Student-Topic Viz");
+		authorTopicViewButton.setBackground(Color.gray);
+		authorTopicViewButton.setForeground(Color.gray);
+		authorTopicViewButton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				JFrame frame=new JFrame("Students and Topics");
+				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				frame.setLayout(new BorderLayout());
+				frame.getContentPane().add(getAuthorTopicViz(), BorderLayout.CENTER);
+				frame.setSize(900, 800);
+				frame.setVisible(true);
+				
+			}
+		});
 		
 		
 		treemap.addControlListener(new MyNodeControl(this));
 		treemap.addControlListener(new MyWheelNaviControl(this));
 		
-		Box box=UILib.getBox(new Component[]{title,searchPanel},true, 10, 3, 0);
+		Box box=UILib.getBox(new Component[]{authorTopicViewButton,title,searchPanel},true, 10, 3, 0);
 		
 		JPanel panel=new JPanel(new BorderLayout());
 		panel.add(treemap, BorderLayout.CENTER);
@@ -189,6 +204,13 @@ public class MainUI extends JPanel {
 	
 	public JTextPane getViewerTextPane(){
 		return this.textPane;
+	}
+	
+	public AuthorTopicViz getAuthorTopicViz(){
+		if(ComponentRegistry.registeredAuthorTopicViz==null){
+			ComponentRegistry.registeredAuthorTopicViz=new AuthorTopicViz();
+		}
+		return ComponentRegistry.registeredAuthorTopicViz;
 	}
 	
 	public static void main(String args[]){

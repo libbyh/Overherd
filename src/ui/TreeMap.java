@@ -25,6 +25,8 @@ import prefuse.util.ui.*;
 import prefuse.visual.*;
 import prefuse.visual.expression.*;
 import prefuse.visual.sort.*;
+import registry.ComponentRegistry;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
@@ -68,6 +70,7 @@ public class TreeMap extends Display {
 	
 	public TreeMap(Tree t, String label){
 		super(new Visualization());
+		ComponentRegistry.registeredTreeMap=this;
 		setup(t, label);
 	}
 	
@@ -75,6 +78,7 @@ public class TreeMap extends Display {
 		super(new Visualization());
 		this.width=width;
 		this.height=height;
+		ComponentRegistry.registeredTreeMap=this;
 		setup(t, label);
 	}
 	
@@ -202,7 +206,7 @@ public class TreeMap extends Display {
 		
 		//depth predicates for selecting nodes at certain depth
 		//initially all depths selected, so need to be added to the filter
-		maxDepth+=1;
+		maxDepth+=2;
 		for(int i=0; i<maxDepth; i++){
 			addDepthPredicate(i);
 		}
@@ -233,12 +237,13 @@ public class TreeMap extends Display {
 		slider.setMinExtent(0);
 		slider.addMouseListener(new MouseAdapter(){
 			public void mousePressed(MouseEvent e){
-				thisInstance.setHighQuality(false);
+			//	thisInstance.setHighQuality(false);
+			
 			}
 			
 			public void mouseReleased(MouseEvent e){
-				thisInstance.setHighQuality(true);
-				thisInstance.repaint();
+			//	thisInstance.setHighQuality(true);
+				
 			}
 		});
 		

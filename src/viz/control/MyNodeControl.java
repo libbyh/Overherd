@@ -66,7 +66,8 @@ public class MyNodeControl extends ControlAdapter {
 			buffer.append(item.getString("message_body"));
 		}
 		
-		this.associatedTextPane.setText(buffer.toString());			
+		this.associatedTextPane.setText(buffer.toString());
+		this.associatedTextPane.setCaretPosition(0);
 	//	System.out.println("itemClicked:" +item.getString("type")+":"+ item.getString("message_body"));
 	}
 }

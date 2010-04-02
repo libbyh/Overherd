@@ -46,9 +46,9 @@ public class MyWheelNaviControl extends ControlAdapter {
                         
                  		if(currentParentItem.getString("type").equals("forum")){
                  		//	buffer.append(item.getString("))
-                 		//	this.associatedMainUI.getViewerTextPane().setText("this is of type forum");
+                 			associatedMainUI.getViewerTextPane().setText("this is of type forum");
                  		}else if(currentParentItem.getString("type").equals("topic")){
-                 		//	this.associatedMainUI.getViewerTextPane().setText("this is of type topic");
+                 			associatedMainUI.getViewerTextPane().setText("this is of type topic");
                  		}else if(currentParentItem.getString("type").equals("message")){
                  			buffer.append("Post id: ");
                  			buffer.append(currentParentItem.getString("message_id"));
@@ -74,7 +74,8 @@ public class MyWheelNaviControl extends ControlAdapter {
                  		}else if(associatedMainUI.getViewerTextPane()==null){
                  			System.out.println("text viewer is null?!?");
                  		}
-                 		associatedMainUI.getViewerTextPane().setText(buffer.toString());			
+                 		associatedMainUI.getViewerTextPane().setText(buffer.toString());
+                 		associatedMainUI.getViewerTextPane().setCaretPosition(0);
                      }
            //  	}
              }
