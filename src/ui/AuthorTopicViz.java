@@ -247,11 +247,11 @@ public class AuthorTopicViz extends Display {
     	Iterator NodeIter=tree.nodes();
     	while (NodeIter.hasNext()){
     		Node originalNode=(Node)NodeIter.next();
-    		String authorName=originalNode.getString("message_author");
+    		String authorName=originalNode.getString("author");
     		Node nodeOne=authorNodeMap.get(authorName);
     		Node originalParent=originalNode.getParent();
     		if(originalParent!=null ){
-    			String parentName=originalParent.getString("message_author");
+    			String parentName=originalParent.getString("author");
     			Node nodeTwo=authorNodeMap.get(parentName);
     			if(nodeTwo !=null){
     				System.out.println("Edge created");
@@ -283,7 +283,7 @@ public class AuthorTopicViz extends Display {
     	while(iter.hasNext()){
     		Node node=(Node)iter.next();
    // 		node.get
-    		String authorName=node.getString("message_author");
+    		String authorName=node.getString("author");
     	//	System.out.println("author found:" + authorName);
     		if(authorCountMap.containsKey(authorName)){//update author count
     			int count=(Integer)authorCountMap.get(authorName).intValue();

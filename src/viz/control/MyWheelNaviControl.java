@@ -59,7 +59,7 @@ public class MyWheelNaviControl extends ControlAdapter {
                  			buffer.append("\n");
                  			
                  			buffer.append("User: ");
-                 			buffer.append(currentParentItem.getString("message_author"));
+                 			buffer.append(currentParentItem.getString("author"));
                  			buffer.append("\n");
                  			
                  			buffer.append("Date: ");
@@ -121,7 +121,7 @@ public class MyWheelNaviControl extends ControlAdapter {
              			buffer.append("\n");
              			
              			buffer.append("User: ");
-             			buffer.append(previousInvokingItem.getString("message_author"));
+             			buffer.append(previousInvokingItem.getString("author"));
              			buffer.append("\n");
              			
              			buffer.append("Date: ");

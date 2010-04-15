@@ -55,7 +55,7 @@ public class MyNodeControl extends ControlAdapter {
 			buffer.append("\n");
 			
 			buffer.append("User: ");
-			buffer.append(item.getString("message_author"));
+			buffer.append(item.getString("author"));
 			buffer.append("\n");
 			
 			buffer.append("Date: ");
