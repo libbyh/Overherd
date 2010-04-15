@@ -14,8 +14,12 @@ import prefuse.Constants;
 import prefuse.Display;
 import prefuse.Visualization;
 import prefuse.action.ActionList;
+import prefuse.action.GroupAction;
 import prefuse.action.RepaintAction;
 import prefuse.action.animate.ColorAnimator;
+import prefuse.action.animate.PolarLocationAnimator;
+import prefuse.action.animate.QualityControlAnimator;
+import prefuse.action.animate.VisibilityAnimator;
 import prefuse.action.assignment.ColorAction;
 import prefuse.action.assignment.SizeAction;
 import prefuse.action.layout.CollapsedSubtreeLayout;
@@ -25,16 +29,23 @@ import prefuse.action.layout.graph.BalloonTreeLayout;
 import prefuse.action.layout.graph.ForceDirectedLayout;
 import prefuse.action.layout.graph.NodeLinkTreeLayout;
 import prefuse.action.layout.graph.RadialTreeLayout;
+import prefuse.activity.Activity;
+import prefuse.activity.SlowInSlowOutPacer;
 import prefuse.controls.DragControl;
+import prefuse.controls.HoverActionControl;
 import prefuse.controls.NeighborHighlightControl;
 import prefuse.controls.PanControl;
 import prefuse.controls.WheelZoomControl;
 import prefuse.controls.ZoomControl;
+import prefuse.controls.FocusControl;
 import prefuse.data.Edge;
 import prefuse.data.Graph;
 import prefuse.data.Node;
 import prefuse.data.Schema;
 import prefuse.data.Tree;
+import prefuse.data.Tuple;
+import prefuse.data.event.TupleSetListener;
+import prefuse.data.tuple.DefaultTupleSet;
 import prefuse.data.tuple.TupleSet;
 import prefuse.render.DefaultRendererFactory;
 import prefuse.render.LabelRenderer;
@@ -47,6 +58,7 @@ import prefuse.visual.DecoratorItem;
 import prefuse.visual.VisualGraph;
 import prefuse.visual.VisualItem;
 import prefuse.visual.expression.InGroupPredicate;
+import prefuse.visual.sort.TreeDepthItemSorter;
 import registry.ComponentRegistry;
 
 public class AuthorTopicViz extends Display {
@@ -87,7 +99,7 @@ public class AuthorTopicViz extends Display {
     	
     	DECORATOR_SCHEMA.setDefault(VisualItem.TEXTCOLOR, ColorLib.gray(100));
         m_vis.addDecorators(EDGE_DECORATORS, EDGES, DECORATOR_SCHEMA);
-        DECORATOR_SCHEMA.setDefault(VisualItem.TEXTCOLOR, ColorLib.gray(128));
+        DECORATOR_SCHEMA.setDefault(VisualItem.TEXTCOLOR, ColorLib.gray(50));
         m_vis.addDecorators(NODE_DECORATORS, NODES, DECORATOR_SCHEMA);
         DECORATOR_SCHEMA.setDefault(VisualItem.TEXTCOLOR, ColorLib.gray(255, 128));
         DECORATOR_SCHEMA.setDefault(VisualItem.FONT, FontLib.getFont("Tahoma", Font.BOLD, 48));
@@ -97,61 +109,112 @@ public class AuthorTopicViz extends Display {
     	nStroke.setDefaultColor(ColorLib.gray(100));
     	nStroke.add("_hover", ColorLib.gray(50));
     	
+    
     	ColorAction nEdges=new ColorAction(EDGES,VisualItem.STROKECOLOR);
-    	nEdges.setDefaultColor(ColorLib.gray(100));
+    	nEdges.setDefaultColor(ColorLib.gray(150));
     	
     	//action lists
-    	ActionList colors=new ActionList();
-    	colors.add(nStroke);
-    	colors.add(new NodeColorAction(NODES));
-    	colors.add(nEdges);
+    	ActionList recolor=new ActionList();
+    	recolor.add(nStroke);
+    //	colors.add(nFill);
+    	
+    	NodeColorAction nodeColor=new NodeColorAction(NODES);
+    	recolor.add(nodeColor);
+    	recolor.add(nEdges);
+    	
+    	m_vis.putAction("recolor", recolor);
     	
     	ActionList animatePaint = new ActionList(400);
         animatePaint.add(new ColorAnimator(NODES));
         animatePaint.add(new RepaintAction());
         m_vis.putAction("animatePaint", animatePaint);
         
+        //repaint
+        ActionList repaint=new ActionList();
+        repaint.add(recolor);
+        repaint.add(new RepaintAction());
+        m_vis.putAction("repaint", repaint);
+        
+        
+        
 //      full paint
         ActionList fullPaint = new ActionList();
         fullPaint.add(new NodeColorAction(NODES));
         m_vis.putAction("fullPaint", fullPaint);
        
-        ForceDirectedLayout forceLayout=new ForceDirectedLayout(GRAPH, true);
-        RadialTreeLayout radialLayout=new RadialTreeLayout(GRAPH,300);
+        RadialTreeLayout treeLayout=new RadialTreeLayout(GRAPH);
+        m_vis.putAction("treeLayout", treeLayout);
         
-        NodeLinkTreeLayout nodeLinkLayout=new NodeLinkTreeLayout(GRAPH);
-        BalloonTreeLayout balloonTreeLayout=new BalloonTreeLayout(GRAPH);
-        RandomLayout randomLayout=new RandomLayout(GRAPH);
-        
-        ActionList initialLayout=new ActionList(1000);	
-        initialLayout.add(colors);
-        initialLayout.add(radialLayout);
         CollapsedSubtreeLayout subLayout = new CollapsedSubtreeLayout(GRAPH);
-        initialLayout.add(subLayout);
+        m_vis.putAction("subLayout", subLayout);
         
         LabelLayout2 edgeDecoLayout=new LabelLayout2(EDGE_DECORATORS);
         LabelLayout2 nodeDecoLayout=new LabelLayout2(NODE_DECORATORS);
-        initialLayout.add(edgeDecoLayout);
-        initialLayout.add(nodeDecoLayout);
-        
         AuthorSizeAction authorSizeAction=new AuthorSizeAction();
-        initialLayout.add(authorSizeAction);
-        initialLayout.add(new RepaintAction());
-        m_vis.putAction("initialLayout", initialLayout);
+      
+        
+        //filter
+        ActionList filter=new ActionList();
+        filter.add(new TreeRootAction(GRAPH));
+        filter.add(authorSizeAction);
+       
+        filter.add(treeLayout);
+        filter.add(subLayout);
+        filter.add(edgeDecoLayout);
+        filter.add(nodeDecoLayout);
+        filter.add(nodeColor);
+        filter.add(nEdges);
+        filter.add(nStroke);
+        filter.add(recolor);
+    //    filter.add(new RepaintAction());
+        m_vis.putAction("filter", filter);
+        
+        //animate
+        ActionList animate=new ActionList(1250);
+        animate.setPacingFunction(new SlowInSlowOutPacer());
+        animate.add(new QualityControlAnimator());
+        animate.add(new VisibilityAnimator(GRAPH));
+        animate.add(new VisibilityAnimator(NODE_DECORATORS));
+        animate.add(new PolarLocationAnimator(GRAPH, "linear"));
+        animate.add(new PolarLocationAnimator(NODE_DECORATORS, "linear"));
+        animate.add(new ColorAnimator(GRAPH));
+    //    animate.add(new ColorAnimator(NODE_DECORATORS));
+        animate.add(recolor);
+        animate.add(new RepaintAction());
+        m_vis.putAction("animate", animate);
+        m_vis.alwaysRunAfter("filter", "animate");
+        
         
         setSize(600,500);
         pan(300, 250);
         setHighQuality(true);
    //     addControlListener(new AggregateDragControl2());
    //     addControlListener(popup);
+        setItemSorter(new TreeDepthItemSorter());
         addControlListener(new ZoomControl());
         addControlListener(new DragControl());
         addControlListener(new PanControl());
         addControlListener(new WheelZoomControl());
+       
+        addControlListener(new FocusControl(1,"filter"));
+        addControlListener(new HoverActionControl("repaint"));
         addControlListener(new NeighborHighlightControl());
         
         
-        m_vis.run("initialLayout");
+        
+        m_vis.run("filter");
+        
+        m_vis.addFocusGroup("linear", new DefaultTupleSet());
+        m_vis.getGroup(Visualization.FOCUS_ITEMS).addTupleSetListener(
+            new TupleSetListener() {
+                public void tupleSetChanged(TupleSet t, Tuple[] add, Tuple[] rem) {
+                    TupleSet linearInterp = m_vis.getGroup("linear");
+                    if ( add.length < 1 ) return; linearInterp.clear();
+                    for ( Node n = (Node)add[0]; n!=null; n=n.getParent() )
+                        linearInterp.addTuple(n);
+                }
+            }
+        );
     }
     
     public void initData(){
@@ -161,6 +224,7 @@ public class AuthorTopicViz extends Display {
     	//set up data columns for nodes
     	graph.addColumn("numPosts", int.class);
     	graph.addColumn(VisualItem.LABEL, String.class);
+    	graph.addColumn("fill_color", int.class);
     	
     	//for each student, create a node
     	Iterator<String> iter=authorCountMap.keySet().iterator();
@@ -170,7 +234,8 @@ public class AuthorTopicViz extends Display {
     		int count=(Integer)authorCountMap.get(name).intValue();
     		node.setString(VisualItem.LABEL, name);
     		node.setInt("numPosts", count);      	
-    		
+    		node.setInt("fill_color", ColorLib.rgba((int)(Math.random()*255),
+    				(int)(Math.random()*255), (int)(Math.random()*255), 100));
     		//add to authorMap    		
     		authorNodeMap.put(name, node);
     		
@@ -185,7 +250,7 @@ public class AuthorTopicViz extends Display {
     		String authorName=originalNode.getString("message_author");
     		Node nodeOne=authorNodeMap.get(authorName);
     		Node originalParent=originalNode.getParent();
-    		if(originalParent!=null){
+    		if(originalParent!=null ){
     			String parentName=originalParent.getString("message_author");
     			Node nodeTwo=authorNodeMap.get(parentName);
     			if(nodeTwo !=null){
@@ -239,16 +304,18 @@ public class AuthorTopicViz extends Display {
         }
         
         public int getColor(VisualItem item) {
-            if ( m_vis.isInGroup(item, Visualization.SEARCH_ITEMS) )
+            if ( m_vis.isInGroup(item, Visualization.SEARCH_ITEMS) ){
                 return ColorLib.rgb(255,190,190);
-            else if ( m_vis.isInGroup(item, Visualization.FOCUS_ITEMS) )
+            }
+            else if ( m_vis.isInGroup(item, Visualization.FOCUS_ITEMS) ){
                 return ColorLib.rgb(198,229,229);
-            else if ( item.isHover() ){
-            	m_vis.run("updateList");
-            	return ColorLib.rgb(255,200,125);
+            } else if ( item.isHover() ){
+            	return ColorLib.rgba(255,200,125,200);
+            } else if(item.isHighlighted()){
+            	return ColorLib.rgba(200, 5, 100,190);
             }
             else
-                return ColorLib.rgb(255,255,255);
+            	return item.getInt("fill_color");
         }
         
     }
@@ -290,7 +357,7 @@ public class AuthorTopicViz extends Display {
                 setX(item, null, bounds.getCenterX());
                 setY(item, null, bounds.getCenterY());
             }
-        //    m_vis.repaint();
+            
         }
     } // end of inner class LabelLayout
     
@@ -305,4 +372,31 @@ public class AuthorTopicViz extends Display {
     	frame.setSize(900, 800);
     	frame.setVisible(true);
     }
+    
+    
+    /**
+     * Switch the root of the tree by requesting a new spanning tree
+     * at the desired root
+     */
+    public static class TreeRootAction extends GroupAction {
+        public TreeRootAction(String graphGroup) {
+            super(graphGroup);
+        }
+        public void run(double frac) {
+            TupleSet focus = m_vis.getGroup(Visualization.FOCUS_ITEMS);
+            if ( focus==null || focus.getTupleCount() == 0 ) return;
+            
+            Graph g = (Graph)m_vis.getGroup(m_group);
+            Node f = null;
+            Iterator tuples = focus.tuples();
+            while (tuples.hasNext() && !g.containsTuple(f=(Node)tuples.next()))
+            {
+                f = null;
+            }
+            if ( f == null ) return;
+            g.getSpanningTree(f);
+        }
+    }
 }
+
+
