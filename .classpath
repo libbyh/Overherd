@@ -18,5 +18,6 @@
 			<attribute name="javadoc_location" value="file:/D:/libraries/jfreechart-1.0.13/javadoc/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="D:/libraries/lingpipe-3.9.1/lingpipe-3.9.1.jar" sourcepath="D:/libraries/lingpipe-3.9.1/src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

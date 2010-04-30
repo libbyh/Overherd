@@ -3,6 +3,7 @@ package ui;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -22,6 +23,7 @@ import prefuse.action.animate.QualityControlAnimator;
 import prefuse.action.animate.VisibilityAnimator;
 import prefuse.action.assignment.ColorAction;
 import prefuse.action.assignment.SizeAction;
+import prefuse.action.filter.GraphDistanceFilter;
 import prefuse.action.layout.CollapsedSubtreeLayout;
 import prefuse.action.layout.Layout;
 import prefuse.action.layout.RandomLayout;
@@ -55,11 +57,13 @@ import prefuse.util.ColorLib;
 import prefuse.util.FontLib;
 import prefuse.util.PrefuseLib;
 import prefuse.visual.DecoratorItem;
+import prefuse.visual.NodeItem;
 import prefuse.visual.VisualGraph;
 import prefuse.visual.VisualItem;
 import prefuse.visual.expression.InGroupPredicate;
 import prefuse.visual.sort.TreeDepthItemSorter;
 import registry.ComponentRegistry;
+import nlp.*;
 
 public class AuthorTopicViz extends Display {
 	public static final String GRAPH = "graph";
@@ -73,7 +77,9 @@ public class AuthorTopicViz extends Display {
     private HashMap<String,Integer> authorCountMap;
     private HashMap<String,Node> authorNodeMap;	
     private Graph graph;
-    
+  //  protected final GraphDistanceFilter dFilter;
+    protected int MaxDepth=99;
+    private VisualGraph g;
 
     private static final Schema DECORATOR_SCHEMA = PrefuseLib.getVisualItemSchema(); 
     static { 
@@ -114,11 +120,13 @@ public class AuthorTopicViz extends Display {
     	nEdges.setDefaultColor(ColorLib.gray(150));
     	
     	//action lists
+    //	dFilter=new GraphDistanceFilter(GRAPH,MaxDepth);
     	ActionList recolor=new ActionList();
     	recolor.add(nStroke);
     //	colors.add(nFill);
     	
     	NodeColorAction nodeColor=new NodeColorAction(NODES);
+   // 	recolor.add(subLayout);
     	recolor.add(nodeColor);
     	recolor.add(nEdges);
     	
@@ -133,10 +141,16 @@ public class AuthorTopicViz extends Display {
         ActionList repaint=new ActionList();
         repaint.add(recolor);
         repaint.add(new RepaintAction());
+      //  repaint.add(dFilter);
         m_vis.putAction("repaint", repaint);
         
         
+   /*     ActionList filterRedraw=new ActionList();
         
+        repaint.add(dFilter);
+        repaint.add(recolor);
+        m_vis.putAction("filterRedraw", filterRedraw);
+     */   
 //      full paint
         ActionList fullPaint = new ActionList();
         fullPaint.add(new NodeColorAction(NODES));
@@ -153,11 +167,12 @@ public class AuthorTopicViz extends Display {
         AuthorSizeAction authorSizeAction=new AuthorSizeAction();
       
         
+        
         //filter
         ActionList filter=new ActionList();
         filter.add(new TreeRootAction(GRAPH));
         filter.add(authorSizeAction);
-       
+   //     filter.add(dFilter);
         filter.add(treeLayout);
         filter.add(subLayout);
         filter.add(edgeDecoLayout);
@@ -202,9 +217,9 @@ public class AuthorTopicViz extends Display {
         
         
         
-        m_vis.run("filter");
-        
+      
         m_vis.addFocusGroup("linear", new DefaultTupleSet());
+        TupleSet focusGroup = m_vis.getGroup(Visualization.FOCUS_ITEMS); 
         m_vis.getGroup(Visualization.FOCUS_ITEMS).addTupleSetListener(
             new TupleSetListener() {
                 public void tupleSetChanged(TupleSet t, Tuple[] add, Tuple[] rem) {
@@ -215,6 +230,51 @@ public class AuthorTopicViz extends Display {
                 }
             }
         );
+        
+     // position and fix the default focus node
+        NodeItem focus = (NodeItem)g.getNode(0);
+      //  PrefuseLib.setX(focus, null, 400);
+      //  PrefuseLib.setY(focus, null, 250);
+        focusGroup.setTuple(focus);
+        m_vis.run("filter");
+        
+        setupTFIDF();
+        
+    }
+    
+    /**
+     * Set up for TFIDF for finding keywords
+     */
+    public void setupTFIDF(){
+    	if(ComponentRegistry.registeredTFIDFHandler==null){
+    		ComponentRegistry.registeredTFIDFHandler=
+    			new TFIDFHandler();
+    	}
+    	
+    	//add each node documents 
+    	TreeMap treeMap=ComponentRegistry.registeredTreeMap;
+    	TFIDFHandler handler=ComponentRegistry.registeredTFIDFHandler;
+    	
+    	Iterator iter=treeMap.getTree().nodes();
+    	while(iter.hasNext()){
+    		Node node=(Node)iter.next();
+    		VisualItem nodeItem=treeMap.getVisualization().getVisualItem("tree.nodes", node);
+    		
+    		if(nodeItem.canGetString("message_body")){
+    			System.out.println("node item:"+nodeItem);
+    			String text=nodeItem.getString("message_body");
+    			
+    			System.out.println("body text:"+text);
+    			if(text!=null){
+    				handler.addDoc(text);
+    			}
+    		}
+    	}
+    	
+    	handler.calculateTFIDFForAllWords();
+    	
+    	
+    	
     }
     
     public void initData(){
@@ -264,7 +324,7 @@ public class AuthorTopicViz extends Display {
     
     
     	
-    	VisualGraph g=m_vis.addGraph(GRAPH, graph);
+    	g=m_vis.addGraph(GRAPH, graph);
     	m_vis.setInteractive(EDGES, null, false);
     	m_vis.setValue(NODES, null, VisualItem.SHAPE, new Integer(Constants.SHAPE_ELLIPSE));
     	

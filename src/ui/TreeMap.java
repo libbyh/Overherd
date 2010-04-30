@@ -57,6 +57,8 @@ public class TreeMap extends Display {
 	private Display thisInstance;
 	private MyOrPredicate depthFilter=null;
 	public MainUI associatedMainUI;
+	private VisualTree vt;
+	private Tree dataTree;
 	
 	private int maxDepth=0;
 	
@@ -82,9 +84,18 @@ public class TreeMap extends Display {
 		setup(t, label);
 	}
 	
+	public VisualTree getVisualTree(){
+		return this.vt;
+	}
+	
+	public Tree getTree(){
+		return this.dataTree;
+	}
+	
 	public void setup(Tree t, String label){
 		//m_vis the the initalized Visualization
-		VisualTree vt=m_vis.addTree(tree, t);
+		vt=m_vis.addTree(tree, t);
+		dataTree=t;
 		thisInstance=this;
 		m_vis.setVisible(edges, null, false);
 		

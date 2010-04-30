@@ -87,12 +87,13 @@ public class MainUI extends JPanel {
 		authorTopicViewButton.setForeground(Color.gray);
 		authorTopicViewButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				JFrame frame=new JFrame("Students and Topics");
-				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-				frame.setLayout(new BorderLayout());
-				frame.getContentPane().add(getAuthorTopicViz(), BorderLayout.CENTER);
-				frame.setSize(900, 800);
-				frame.setVisible(true);
+				if(ComponentRegistry.registeredAuthorTopicVizUI==null){
+					ComponentRegistry.registeredAuthorTopicVizUI=
+						new AuthorTopicVizUI("Students and Topics");
+					
+				}
+				ComponentRegistry.registeredAuthorTopicVizUI.setVisible(true);
+				
 				
 			}
 		});
@@ -141,12 +142,12 @@ public class MainUI extends JPanel {
 		
 		//chart
 		JPanel cPanel=new JPanel();
-		cPanel.setPreferredSize(new Dimension(800,50));
+		cPanel.setPreferredSize(new Dimension(800,70));
 		
 		TimeChart chart=new TimeChart("Test", treemap);
-		chart.setPreferredSize(new Dimension(700,50));
-		chart.setMaximumSize(new Dimension(700,50));
-		chart.setMaximizedBounds(new Rectangle(0,0,700,50));
+		chart.setPreferredSize(new Dimension(700,70));
+		chart.setMaximumSize(new Dimension(700,70));
+		chart.setMaximizedBounds(new Rectangle(0,0,700,70));
 	//	controlPanel.add(chart.getChartPanel(),BorderLayout.NORTH);
 		//range control
 		JRangeSlider rangeSlider=treemap.getSlider();
