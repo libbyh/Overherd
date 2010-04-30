@@ -75,8 +75,10 @@ public class TFIDFHandler {
                 
             //    System.out.printf("\n %18s  %8s\n", term, score);
             }
-            Arrays.sort(tags.toArray(), java.util.Collections.reverseOrder());
             if(tags.size()>0){
+            	System.out.println(tags);
+            	java.util.Collections.sort(tags, java.util.Collections.reverseOrder());
+            	
             	System.out.println(tags);
            // 	System.out.println(tags.get(1));
             }
