@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import prefuse.Constants;
 import prefuse.Display;
@@ -63,6 +64,7 @@ import prefuse.visual.VisualItem;
 import prefuse.visual.expression.InGroupPredicate;
 import prefuse.visual.sort.TreeDepthItemSorter;
 import registry.ComponentRegistry;
+import viz.control.MyAuthorTopicVizNodeControl;
 import nlp.*;
 
 public class AuthorTopicViz extends Display {
@@ -80,6 +82,7 @@ public class AuthorTopicViz extends Display {
   //  protected final GraphDistanceFilter dFilter;
     protected int MaxDepth=99;
     private VisualGraph g;
+    private static Node currentRootNode;
 
     private static final Schema DECORATOR_SCHEMA = PrefuseLib.getVisualItemSchema(); 
     static { 
@@ -117,7 +120,7 @@ public class AuthorTopicViz extends Display {
     	
     
     	ColorAction nEdges=new ColorAction(EDGES,VisualItem.STROKECOLOR);
-    	nEdges.setDefaultColor(ColorLib.gray(150));
+    	nEdges.setDefaultColor(ColorLib.gray(180));
     	
     	//action lists
     //	dFilter=new GraphDistanceFilter(GRAPH,MaxDepth);
@@ -213,6 +216,7 @@ public class AuthorTopicViz extends Display {
        
         addControlListener(new FocusControl(1,"filter"));
         addControlListener(new HoverActionControl("repaint"));
+        addControlListener(new MyAuthorTopicVizNodeControl());
         addControlListener(new NeighborHighlightControl());
         
         
@@ -238,14 +242,160 @@ public class AuthorTopicViz extends Display {
         focusGroup.setTuple(focus);
         m_vis.run("filter");
         
-        setupTFIDF();
+    //    setupTFIDF();
+        
+        setupContentAnalysis();
         
     }
+    
+    
+    /**
+     * Sets up author-author matrix with conversation contents.  
+     * Also calculate TFIDF values for words
+     * 
+     */
+    public void setupContentAnalysis(){
+    	
+    	//Check if findUniqueAuthors has been called
+    	if(authorCountMap.isEmpty()){
+    		this.findUniqueAuthors();
+    	}
+    	
+    	//for each author, create a UserConversationMap object and put it in the map
+    	if(ComponentRegistry.registeredUserMatrix==null){
+    		ComponentRegistry.registeredUserMatrix=new HashMap<String,UserConversationMap>();
+    	}
+    	
+    	Set<String> authors=authorCountMap.keySet();
+    	for(String author:authors){
+    		ComponentRegistry.registeredUserMatrix.put(author, new UserConversationMap(author));
+    	}
+    	    	
+    	//add each node documents 
+    	TreeMap treeMap=ComponentRegistry.registeredTreeMap;
+    	
+    	if(ComponentRegistry.registeredTFIDFHandler==null){
+    		ComponentRegistry.registeredTFIDFHandler=
+    			new TFIDFHandler();
+    	}
+    	TFIDFHandler handler=ComponentRegistry.registeredTFIDFHandler;
+    	
+    	//for each edge, find two authors, update user matrix
+    	Tree tree=treeMap.getTree();
+    	int numEdges=tree.getEdgeCount();
+    	
+    	int countDone=0;
+    	Iterator iter=tree.edges();
+    	while(iter.hasNext()){
+    		Edge edge=(Edge)iter.next();
+    		VisualItem edgeItem=treeMap.getVisualization().getVisualItem("tree.edges", edge);
+    		
+    		Node sourceNode=edge.getSourceNode();
+    		Node targetNode=edge.getTargetNode();
+    		String sourceAuthor=sourceNode.getString("author");
+    		String targetAuthor=targetNode.getString("author");
+
+    		
+    		String sourceMessage="";
+    		String targetMessage="";
+    		if(sourceNode.canGetString("message_body")){
+    			sourceMessage=sourceNode.getString("message_body");
+    		}
+    		if(targetNode.canGetString("message_body")){
+    			targetMessage=targetNode.getString("message_body");
+    		}
+    		
+    		//if A wrote message Ma and B replied to it with Mb, map A<->B:Ma, A<->B:Mb, and save this information for each A and B
+    		UserConversationMap sourceMap=ComponentRegistry.registeredUserMatrix.get(sourceAuthor);
+    		UserConversationMap targetMap=ComponentRegistry.registeredUserMatrix.get(targetAuthor);
+    		if(sourceMessage!=null && !sourceMessage.equals("")){
+    			//if map already has the other author
+    			if(sourceMap.getConversationMap().containsKey(targetAuthor)){
+    				HashSet<String> mList=sourceMap.getConversationMap().get(targetAuthor);
+    				mList.add(sourceMessage);
+    				sourceMap.getConversationMap().put(targetAuthor, mList);
+    				sourceMap.getEntireConversationBuffer().append(sourceMessage);
+    				sourceMap.getEntireConversationBuffer().append(" ");
+    			}else{//create an entry for the other author
+    				HashSet<String> mList=new HashSet<String>();
+    				mList.add(sourceMessage);
+    				sourceMap.getConversationMap().put(targetAuthor, mList);
+    				sourceMap.getEntireConversationBuffer().append(sourceMessage);
+    				sourceMap.getEntireConversationBuffer().append(" ");
+    			}
+    			//do the same for target author
+    			//if map already has the other author
+    			if(targetMap.getConversationMap().containsKey(sourceAuthor)){
+    				HashSet<String> mList=targetMap.getConversationMap().get(sourceAuthor);
+    				mList.add(sourceMessage);
+    				targetMap.getConversationMap().put(sourceAuthor, mList);
+    				targetMap.getEntireConversationBuffer().append(targetMessage);
+    				targetMap.getEntireConversationBuffer().append(" ");
+    			}else{//create an entry for the other author
+    				HashSet<String> mList=new HashSet<String>();
+    				mList.add(sourceMessage);
+    				targetMap.getConversationMap().put(sourceAuthor, mList);
+    				targetMap.getEntireConversationBuffer().append(targetMessage);
+    				targetMap.getEntireConversationBuffer().append(" ");
+    			}
+    		}
+    		
+    		if(targetMessage!=null && !targetMessage.equals("")){
+    			//if map already has the other author
+    			if(sourceMap.getConversationMap().containsKey(targetAuthor)){
+    				HashSet<String> mList=sourceMap.getConversationMap().get(targetAuthor);
+    				mList.add(targetMessage);
+    				sourceMap.getConversationMap().put(targetAuthor, mList);
+    				
+    			}else{//create an entry for the other author
+    				HashSet<String> mList=new HashSet<String>();
+    				mList.add(targetMessage);
+    				sourceMap.getConversationMap().put(targetAuthor, mList);
+    			}
+    			//do the same for target author
+    			//if map already has the other author
+    			if(targetMap.getConversationMap().containsKey(sourceAuthor)){
+    				HashSet<String> mList=targetMap.getConversationMap().get(sourceAuthor);
+    				mList.add(targetMessage);
+    				targetMap.getConversationMap().put(sourceAuthor, mList);
+    				
+    			}else{//create an entry for the other author
+    				HashSet<String> mList=new HashSet<String>();
+    				mList.add(targetMessage);
+    				targetMap.getConversationMap().put(sourceAuthor, mList);
+    			}
+    		}
+    //		sourceMap.addConversationForUser(targetAuthor, conversation)
+    		countDone+=1;
+    	}
+    	
+    	
+    	
+    	/*Iterator iter=treeMap.getTree().nodes();
+    	while(iter.hasNext()){
+    		Node node=(Node)iter.next();
+    		VisualItem nodeItem=treeMap.getVisualization().getVisualItem("tree.nodes", node);
+    		
+    		if(nodeItem.canGetString("message_body")){
+    			System.out.println("node item:"+nodeItem);
+    			String text=nodeItem.getString("message_body");
+    			
+    			System.out.println("body text:"+text);
+    			if(text!=null){
+    				handler.addDoc(text);
+    			}
+    		}
+    	}
+    	*/
+    	
+    	handler.calculateTFIDFForAllWords();
+    }
+    
     
     /**
      * Set up for TFIDF for finding keywords
      */
-    public void setupTFIDF(){
+  /*  public void setupTFIDF(){
     	if(ComponentRegistry.registeredTFIDFHandler==null){
     		ComponentRegistry.registeredTFIDFHandler=
     			new TFIDFHandler();
@@ -275,6 +425,20 @@ public class AuthorTopicViz extends Display {
     	
     	
     	
+    }
+    */
+    /**
+     * Creates a matrix of conversation, so each student is mapped to a list of other students with conversatoin content
+     */
+    public void createConversationMatrix(){
+    	
+    }
+    
+    public JPanel setupKeywordView(){
+    	JPanel viewPanel=new JPanel();
+    	
+    	
+    	return viewPanel;
     }
     
     public void initData(){
@@ -355,6 +519,15 @@ public class AuthorTopicViz extends Display {
     		
     	
     	}
+    }
+    
+    
+    public Graph getAuthorGraph(){
+    	return this.graph;
+    }
+    
+    public Node getCurrentRootNode(){
+    	return currentRootNode;
     }
     
     public static class NodeColorAction extends ColorAction {
@@ -454,6 +627,7 @@ public class AuthorTopicViz extends Display {
                 f = null;
             }
             if ( f == null ) return;
+            currentRootNode=f;
             g.getSpanningTree(f);
         }
     }

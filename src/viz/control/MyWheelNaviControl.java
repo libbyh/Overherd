@@ -1,5 +1,9 @@
 package viz.control;
 
+/**
+ * For display info about parent in the treeMap
+ */
+
 import java.awt.Point;
 import java.awt.event.MouseWheelEvent;
 

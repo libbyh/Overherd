@@ -220,7 +220,7 @@ public class MainUI extends JPanel {
 			inputFile=args[0];
 		}else{
 		//	inputFile="D:/workspace3/Overherd/data/forumTree5.xml";
-			inputFile="E:/Users/kevin/My Documents/Aptana RadRails Workspace/Sakai/forumTree6a.xml";
+			inputFile="data/forumTree6a.xml";
 	//	javax.swing.SwingUtilities.invokeLater(new Runnable(){
 	//		public void run(){
 				MainUI ui=new MainUI(inputFile);
