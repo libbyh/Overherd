@@ -97,6 +97,7 @@ public class AuthorTopicVizUI extends JFrame implements ItemListener {
 		this.fullTextView.setLayout(new BorderLayout());
 		fullTextViewLabel=new JLabel("Click a student to center and hover over another to see conversation.");
 		fullTextView.add(fullTextViewLabel,BorderLayout.NORTH);
+		
 		JScrollPane scrollPane=new JScrollPane();
 		fullTextArea=new JTextArea();
 		fullTextArea.setLineWrap(true);

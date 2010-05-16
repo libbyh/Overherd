@@ -14,7 +14,7 @@ import ui.UserConversationMap;
 public class MyAuthorTopicVizNodeControl extends ControlAdapter {
 	
 	
-	public void itemEntered(VisualItem item, MouseEvent e){
+	public void itemClicked(VisualItem item, MouseEvent e){
 		
 		Graph graph=ComponentRegistry.registeredAuthorTopicViz.getAuthorGraph();
 		Node rootNode=ComponentRegistry.registeredAuthorTopicViz.getCurrentRootNode();

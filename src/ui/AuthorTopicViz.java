@@ -1,7 +1,9 @@
 package ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,6 +12,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import prefuse.Constants;
@@ -214,14 +217,28 @@ public class AuthorTopicViz extends Display {
         addControlListener(new PanControl());
         addControlListener(new WheelZoomControl());
        
-        addControlListener(new FocusControl(1,"filter"));
+        addControlListener(new FocusControl(2,"filter"));
         addControlListener(new HoverActionControl("repaint"));
         addControlListener(new MyAuthorTopicVizNodeControl());
         addControlListener(new NeighborHighlightControl());
         
         
-        
+        this.setToolTipText("Double click a node to center it.\n Click a neighbor node to show the posts between the students.");
       
+        JPanel helpPanel=new JPanel(){
+        	protected void paintComponent(Graphics g){
+        		g.setColor(getBackground());
+        		g.fillRect(0, 0, getWidth(), getHeight());
+        		super.paintComponent(g);
+        	}
+        };
+        helpPanel.setOpaque(false);
+        helpPanel.setBackground(new Color(40,40,40,60));
+        helpPanel.add(new JLabel("Double click a node to center it."));
+        helpPanel.add(new JLabel("And click a neighbor node to show conversation."));
+        this.add(helpPanel);
+        helpPanel.setBounds(3, 4, 300, 50);
+        
         m_vis.addFocusGroup("linear", new DefaultTupleSet());
         TupleSet focusGroup = m_vis.getGroup(Visualization.FOCUS_ITEMS); 
         m_vis.getGroup(Visualization.FOCUS_ITEMS).addTupleSetListener(
