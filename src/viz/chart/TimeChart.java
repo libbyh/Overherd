@@ -65,11 +65,10 @@ public class TimeChart extends ApplicationFrame {
 	 */
 	public static JFreeChart createChart(XYDataset dataset){
 		JFreeChart chart=ChartFactory.createTimeSeriesChart(
-				"Number of posts",
-				"Date",
-				"Number",
+				null,
+				"number of posts",null,
 				dataset,
-				true,
+				false,
 				true,
 				false);
 		

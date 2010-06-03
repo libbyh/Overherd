@@ -18,6 +18,7 @@ import prefuse.controls.*;
 import prefuse.data.*;
 import prefuse.data.io.*;
 import prefuse.data.query.*;
+import prefuse.util.ColorLib;
 import prefuse.util.FontLib;
 import prefuse.util.ui.*;
 import prefuse.visual.*;
@@ -92,7 +93,7 @@ public class MainUI extends JPanel {
 						new AuthorTopicVizUI("Students and Topics");
 					
 				}
-				ComponentRegistry.registeredAuthorTopicVizUI.setVisible(true);
+				ComponentRegistry.registeredAuthorTopicVizUI.showUI();
 				
 				
 			}
@@ -107,7 +108,7 @@ public class MainUI extends JPanel {
 		JPanel panel=new JPanel(new BorderLayout());
 		panel.add(treemap, BorderLayout.CENTER);
 		panel.add(box, BorderLayout.SOUTH);
-		UILib.setColor(panel, Color.BLACK, Color.GRAY);
+		UILib.setColor(panel, ColorLib.getColor(ColorLib.gray(50)), Color.WHITE);
 		
 		this.setLayout(new BorderLayout());
 		this.add(panel, BorderLayout.CENTER);
@@ -127,42 +128,50 @@ public class MainUI extends JPanel {
 	
 		
 		viewerPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-		UILib.setColor(viewerPanel, Color.BLACK, Color.GRAY);
-		UILib.setColor(viewScroll, Color.BLACK, Color.GRAY);
+		UILib.setColor(viewerPanel, ColorLib.getColor(ColorLib.gray(50)), Color.WHITE);
+		UILib.setColor(viewScroll, ColorLib.getColor(ColorLib.gray(50)), Color.WHITE);
 		this.add(viewerPanel, BorderLayout.EAST);
 		
 		//Controller
 		JPanel controlPanel=new JPanel();
 		controlPanel.setLayout(new BorderLayout());
 		controlPanel.setPreferredSize(new Dimension(1000,200));
-		controlPanel.add(new JLabel(" c o n t r o l l e r "), BorderLayout.NORTH);
-		controlPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-		//UILib.setColor(controlPanel, Color.BLACK, Color.GRAY);
-		this.add(controlPanel, BorderLayout.SOUTH);
+	//	controlPanel.setAlignmentX(SwingConstants.CENTER);
+		JLabel ctitle=new JLabel("- C O N T R O L L E R -", SwingConstants.CENTER);
+		ctitle.setPreferredSize(new Dimension(800,20));
+		ctitle.setMaximumSize(new Dimension(800,20));
+	//	ctitle.setAlignmentX(SwingConstants.CENTER);
+		controlPanel.add(ctitle, BorderLayout.NORTH, SwingConstants.CENTER);
+		
+		
 		
 		//chart
 		JPanel cPanel=new JPanel();
-		cPanel.setPreferredSize(new Dimension(800,70));
+	//	cPanel.setPreferredSize(new Dimension(800,170));
+		cPanel.setLayout(new BorderLayout());
 		
 		TimeChart chart=new TimeChart("Test", treemap);
-		chart.setPreferredSize(new Dimension(700,70));
-		chart.setMaximumSize(new Dimension(700,70));
-		chart.setMaximizedBounds(new Rectangle(0,0,700,70));
+		JPanel chartPanel=chart.getChartPanel();
+		chartPanel.setPreferredSize(new Dimension(800,110));
 	//	controlPanel.add(chart.getChartPanel(),BorderLayout.NORTH);
 		//range control
 		JRangeSlider rangeSlider=treemap.getSlider();
+		rangeSlider.setPreferredSize(new Dimension(800,50));
 		
-		Box cBox=new Box(BoxLayout.Y_AXIS);
-		cBox.add(cPanel);
+	//	Box cBox=new Box(BoxLayout.Y_AXIS);
+		
+		
 		rangeLabel=new JLabel("  Slide thumbs to change the date range.");
 			//	+ rangeSlider.getLowValue() + " - " + rangeSlider.getHighValue());
 		rangeLabel.setHorizontalAlignment(SwingConstants.LEFT);
 		rangeLabel.setVerticalAlignment(SwingConstants.BOTTOM);
+		rangeLabel.setPreferredSize(new Dimension(800,20));
 		
-		cBox.add(chart.getChartPanel());
-		cBox.add(rangeLabel);
-		cBox.add(rangeSlider);
-		controlPanel.add(cBox, BorderLayout.CENTER);
+		cPanel.add(chartPanel, BorderLayout.SOUTH);
+		cPanel.add(rangeLabel, BorderLayout.NORTH);
+		cPanel.add(rangeSlider, BorderLayout.CENTER);
+		
+		controlPanel.add(cPanel, BorderLayout.CENTER);
 		
 		//select control
 		Box sBox=new Box(BoxLayout.Y_AXIS);
@@ -199,6 +208,9 @@ public class MainUI extends JPanel {
 		}
 		controlPanel.add(dScroll, BorderLayout.EAST);
 		
+		controlPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		//UILib.setColor(controlPanel, Color.BLACK, Color.GRAY);
+		this.add(controlPanel, BorderLayout.SOUTH);
 		
 		
 	}

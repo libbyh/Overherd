@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import nlp.MyDocument;
+
 /**
  * For this user, has a map to other users with conversation content
  * @author kevin
@@ -20,7 +22,9 @@ public class UserConversationMap {
 	 * 
 	 * *Note: the other user will also have his own map that lists this user, so the content is listed twice.
 	 */
-	private HashMap<String, HashSet<String>> conversationMap=new HashMap<String,HashSet<String>>();
+	
+	
+	private HashMap<String, HashSet<MyDocument>> conversationMap=new HashMap<String,HashSet<MyDocument>>();
 	private HashSet<String> highTFIDFWords=new HashSet<String>();
 	private StringBuffer entireConversationBuffer=new StringBuffer();	//concatenate all the posts in the map - used to check if a word is found
 	
@@ -29,20 +33,20 @@ public class UserConversationMap {
 	}
 	
 	
-	public HashMap<String,HashSet<String>> getConversationMap(){
+	public HashMap<String,HashSet<MyDocument>> getConversationMap(){
 		return this.conversationMap;
 	}
 	
-	public void addConversationForUser(String otherUser,String conversation){
+	public void addConversationForUser(String otherUser,MyDocument conversation){
 		
 		//if other user first encountered, create an entry in the map
 		if(!conversationMap.containsKey(otherUser)){
-			HashSet<String> set=new HashSet<String>();
+			HashSet<MyDocument> set=new HashSet<MyDocument>();
 			set.add(conversation);
 			conversationMap.put(otherUser, set);
 		}else{
 			//if other user already in the map, just update the conversation
-			HashSet<String> set=conversationMap.get(otherUser);
+			HashSet<MyDocument> set=conversationMap.get(otherUser);
 			set.add(conversation);
 			conversationMap.put(otherUser, set);
 		}
@@ -69,7 +73,7 @@ public class UserConversationMap {
 		if(!conversationMap.containsKey(otherUser)){
 			return 0;
 		}else{
-			HashSet<String> set=conversationMap.get(otherUser);
+			HashSet<MyDocument> set=conversationMap.get(otherUser);
 			return set.size();
 		}
 	}

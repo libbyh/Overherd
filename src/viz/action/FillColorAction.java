@@ -16,8 +16,12 @@ public class FillColorAction extends ColorAction {
 	public FillColorAction(String group){
 		super(group, VisualItem.FILLCOLOR);
 	}
-	private ColorMap cmap=new ColorMap(ColorLib.getInterpolatedPalette(10,
-			ColorLib.rgb(85, 85, 85), ColorLib.rgb(0, 0, 0)), 0, 9);
+//	private ColorMap cmap=new ColorMap(ColorLib.getInterpolatedPalette(10,
+	//		ColorLib.rgb(85, 85, 85), ColorLib.rgb(0, 0, 0)), 0, 9);
+	
+	private ColorMap cmap=new ColorMap(ColorLib.getInterpolatedPalette(10, 
+			ColorLib.rgb(0, 204, 255), ColorLib.rgb(0, 0, 153)),0,9);
+	
 	
 	public int getColor(VisualItem item){
 		if(item instanceof NodeItem){

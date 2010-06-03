@@ -14,6 +14,10 @@ public class TagWithTFIDF implements Comparable {
 		score=s;
 	}
 	
+	public String getTag(){
+		return this.word;
+	}
+	
 	public double getScore(){
 		return score;
 	}

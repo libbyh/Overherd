@@ -76,6 +76,10 @@ public class MyTfIdfDistance extends TokenizedDistance
         ++mDocCount;
 
     }
+    
+    public void handle(MyDocument doc){
+    	handle(doc.getContent());
+    }
 
     /**
      * Return the TF/IDF distance between the specified character

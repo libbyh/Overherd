@@ -244,7 +244,9 @@ public class TreeMap extends Display {
 		});
 		
 		slider=rQ.createHorizontalRangeSlider();
-		slider.setThumbColor(ColorLib.getColor(100, 100, 34));
+		slider.setThumbColor(ColorLib.getColor(ColorLib.gray(100)));
+		slider.setToolTipText("Drag either or both thumbs to change the date range. " +
+				"\nYou can also create a region using the thumbs and drag is to see which posts have been added in the period.");
 		slider.setMinExtent(0);
 		slider.addMouseListener(new MouseAdapter(){
 			public void mousePressed(MouseEvent e){
