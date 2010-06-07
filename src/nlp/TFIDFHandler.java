@@ -49,6 +49,7 @@ public class TFIDFHandler {
     		BufferedReader input=new BufferedReader(new FileReader("data/stopwords.txt"));
     		String line=null;
     		while((line=input.readLine())!=null){
+    			
     			ComponentRegistry.registeredStopWordSet.add(line);
     		}
     	}catch(Exception e){
@@ -56,10 +57,10 @@ public class TFIDFHandler {
     	}
         
         
-        System.out.println("Printing stopwords...");
-        for(String t:ComponentRegistry.registeredStopWordSet){
-        	System.out.println("stopword:"+t);
-        }
+   //     System.out.println("Printing stopwords...");
+   //     for(String t:ComponentRegistry.registeredStopWordSet){
+   //     	System.out.println("stopword:"+t);
+   //     }
     }
 
     /*
@@ -125,20 +126,28 @@ public class TFIDFHandler {
             ObjectToCounterMap<String> tf1=tfIdfHandler.termFrequencyVector(doc.getContent());
             for(Map.Entry<String,Counter>entry:tf1.entrySet()){
                 String term=entry.getKey();
+                
+                if(term.length()==1){
+                	continue;
+                }
+                                
                 Counter counter=entry.getValue();
                 double score=tfIdfHandler.tfIdf(term, counter);
                 TagWithTFIDF tag=new TagWithTFIDF(term, score);
-                tags.add(tag);
-                System.out.println("tag:"+tag);
-                ComponentRegistry.registeredGlobalTagSet.addTagWithTFIDF(tag);
-                doc.getTagSet().add(tag);
+                if(!tags.contains(tag) && !ComponentRegistry.registeredStopWordSet.contains(tag.getTag().toLowerCase())){
+                	tags.add(tag);
+                //	System.out.println("tag:"+tag);
+                    ComponentRegistry.registeredGlobalTagSet.addTagWithTFIDF(tag);
+                //    doc.getTagSet().add(tag);
+                }
+                
             //    System.out.printf("\n %18s  %8s\n", term, score);
             }
             if(tags.size()>0){
-            	System.out.println(tags);
-            	java.util.Collections.sort(tags, java.util.Collections.reverseOrder());
             	
+            	java.util.Collections.sort(tags, java.util.Collections.reverseOrder());
             	System.out.println(tags);
+            	doc.setTagSet(tags);
            // 	System.out.println(tags.get(1));
             }
         }

@@ -14,24 +14,24 @@ public class MyDocument {
 	private String userName;
 	private String content;
 	private String tokenizedContent;
-	HashSet<TagWithTFIDF> tags;
+	ArrayList<TagWithTFIDF> tags;
 	
-	public MyDocument(String userName,String content, HashSet<TagWithTFIDF> tags){
+	public MyDocument(String userName,String content, ArrayList<TagWithTFIDF> tags){
 		setup(userName,content,tags);
 	}
 	
 	public MyDocument(String userName,String content){
-		setup(userName,content,new HashSet<TagWithTFIDF>());
+		setup(userName,content,new ArrayList<TagWithTFIDF>());
 	}
 	
 	public MyDocument(String userName){
-		setup(userName,"",new HashSet<TagWithTFIDF>());
+		setup(userName,"",new ArrayList<TagWithTFIDF>());
 	}
 	
-	public void setup(String userName, String content, HashSet<TagWithTFIDF> tags){
+	public void setup(String userName, String content, ArrayList<TagWithTFIDF> tags){
 		this.userName=userName;
 		this.content=content;
-		this.tags=new HashSet<TagWithTFIDF>();
+		this.tags=new ArrayList<TagWithTFIDF>();
 	}
 	
 	
@@ -51,11 +51,11 @@ public class MyDocument {
 		return this.content;
 	}
 	
-	public HashSet<TagWithTFIDF> getTagSet(){
+	public ArrayList<TagWithTFIDF> getTagSet(){
 		return this.tags;
 	}
 	
-	public void setTagSet(HashSet<TagWithTFIDF> set){
+	public void setTagSet(ArrayList<TagWithTFIDF> set){
 		this.tags=set;
 	}
 	

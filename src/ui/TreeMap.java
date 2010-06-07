@@ -66,7 +66,7 @@ public class TreeMap extends Display {
 	static{
 		LABEL_SCHEMA.setDefault(VisualItem.INTERACTIVE, false);
 		LABEL_SCHEMA.setDefault(VisualItem.TEXTCOLOR, ColorLib.gray(200));
-		LABEL_SCHEMA.setDefault(VisualItem.FONT, FontLib.getFont("Tahoma", 12));
+		LABEL_SCHEMA.setDefault(VisualItem.FONT, FontLib.getFont("Tahoma", 14));
 	}
 	
 	

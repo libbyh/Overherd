@@ -1,8 +1,15 @@
 package viz.control;
 
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.swing.JComponent;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.Highlighter;
+import javax.swing.text.JTextComponent;
 
 import nlp.MyDocument;
 import nlp.TagWithTFIDF;
@@ -64,10 +71,43 @@ public class MyAuthorTopicVizNodeControl extends ControlAdapter {
 		
 		int view=ComponentRegistry.registeredAuthorTopicVizUI.getSelectedTabIndex();
 		
-		if(view==ValueRegistry.CONVERSATION_TEXT_TAB_VIEW){
 			
+			//set for keyword view
 			StringBuffer buffer=new StringBuffer();
 			int count=0;
+			ArrayList<String> tagStringList=new ArrayList<String>();	//for highlighting keywords
+			for(MyDocument m:mSet){
+				buffer.append("-----------------------------------------------------\n");
+				ArrayList<TagWithTFIDF> tags=m.getTagSet();
+				int numToShow=(int)(tags.size()*ValueRegistry.KEYWORD_PERCENTAGE_TO_SHOW);
+				numToShow=Math.max(numToShow, 1);
+				System.out.println("Showing "+numToShow+ " keywords...");
+				
+				for(int i=0; i<numToShow; i++){
+					TagWithTFIDF tag=tags.get(i);
+					tagStringList.add(tag.getTag());
+					
+					buffer.append(tag.getTag());
+					buffer.append(", ");
+					
+					++count;
+				}
+				
+				buffer.append("\n");
+			
+			
+			ComponentRegistry.registeredAuthorTopicVizUI.setKeywordViewLabelText(sourceAuthor + " and "+neighborAuthor+
+					"\'s keywords (showing top "+ (int)(100*ValueRegistry.KEYWORD_PERCENTAGE_TO_SHOW)+"%):");
+			
+			ComponentRegistry.registeredAuthorTopicVizUI.getKeywordView().setText(buffer.toString());
+			ComponentRegistry.registeredAuthorTopicVizUI.getKeywordView().setCaretPosition(0);
+			}
+			
+
+			
+			//set for full text view
+			buffer=new StringBuffer();
+			count=0;
 			for(MyDocument m:mSet){
 				buffer.append("-----------------------------------------------------\n");
 				buffer.append(m.getContent());
@@ -79,27 +119,36 @@ public class MyAuthorTopicVizNodeControl extends ControlAdapter {
 			
 			ComponentRegistry.registeredAuthorTopicVizUI.getFullTextView().setText(buffer.toString());
 			ComponentRegistry.registeredAuthorTopicVizUI.getFullTextView().setCaretPosition(0);
-		}else if(view==ValueRegistry.CONVERSATION_SENTENCE_TAB_VIEW){
+		
 			
+			//highlight the words
+			highlightKeywords(ComponentRegistry.registeredAuthorTopicVizUI.getFullTextView(), tagStringList);
+	}
+	
+	
+	/**
+	 * Highlight all the words
+	 * @param component
+	 * @param tags
+	 */
+	public void highlightKeywords(JTextComponent component, ArrayList<String> tags){
+		try{
+			Highlighter hilite=component.getHighlighter();
+			Document doc=component.getDocument();
+			String text=doc.getText(0, doc.getLength());
 			
-		}else if(view==ValueRegistry.CONVERSATION_KEYWORD_TAB_VIEW){
-			StringBuffer buffer=new StringBuffer();
-			int count=0;
-			for(MyDocument m:mSet){
-				buffer.append("-----------------------------------------------------\n");
-				Set<TagWithTFIDF> tags=m.getTagSet();
-				for(TagWithTFIDF tag:tags){
-					buffer.append(tag.getTag());
-					buffer.append("\n\n");
-					++count;
+			for(String tag:tags){
+				int pos=0;
+				while((pos=text.indexOf(tag,pos))>=0){
+					hilite.addHighlight(pos, pos+tag.length(), ValueRegistry.DEFAULT_KEYWORD_HIGHLIGHTER);
+					pos+=tag.length();
 				}
 			}
 			
-			ComponentRegistry.registeredAuthorTopicVizUI.setKeywordViewLabelText(sourceAuthor + " and "+neighborAuthor+
-					"\'s conversation: ("+count+" words)");
 			
-			ComponentRegistry.registeredAuthorTopicVizUI.getKeywordView().setText(buffer.toString());
-			ComponentRegistry.registeredAuthorTopicVizUI.getKeywordView().setCaretPosition(0);
+			
+		}catch(BadLocationException e){
+			e.printStackTrace();
 		}
 	}
 }

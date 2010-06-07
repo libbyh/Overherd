@@ -1,6 +1,7 @@
 package ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ItemEvent;
@@ -21,13 +22,15 @@ import prefuse.Visualization;
 import prefuse.data.Edge;
 import prefuse.data.Node;
 import prefuse.data.Tree;
+import prefuse.util.ColorLib;
+import prefuse.util.ui.UILib;
 import prefuse.visual.VisualItem;
 
 import registry.ComponentRegistry;
 import registry.ValueRegistry;
 
 
-public class AuthorTopicVizUI extends JFrame implements ItemListener,PropertyChangeListener {
+public class AuthorTopicVizUI extends JFrame implements ItemListener {
 
 	private JCheckBox directAuthorsCheck;
 	private JTabbedPane tabbedPane=new JTabbedPane();
@@ -47,8 +50,9 @@ public class AuthorTopicVizUI extends JFrame implements ItemListener,PropertyCha
 	
 
     private ContentAnalysisTask cTask;
-    private ProgressMonitor monitor;
-	
+  //  private ProgressMonitor monitor;
+	private JProgressBar progressBar=new JProgressBar(0,100);
+    
 	JCheckBox showTopicsCheck;
 
 	
@@ -75,14 +79,15 @@ public class AuthorTopicVizUI extends JFrame implements ItemListener,PropertyCha
 	
 	public void showUI(){
 		 if(!ValueRegistry.CONTENT_ANALYZED){
-		        monitor=new ProgressMonitor(null,"Content analysis in progress.  Please wait...","",0,100);
+		  /*      monitor=new ProgressMonitor(null,"Content analysis in progress.  Please wait...","",0,100);
 		        monitor.setMillisToDecideToPopup(0);
 		        monitor.setMillisToPopup(1500);
 		        monitor.setProgress(0);
-		        
-		        
+		    */    
+			 	
+		        ComponentRegistry.registeredProgressBarFrame.showUI("Please wait while analyzing content...");
 		        cTask=new ContentAnalysisTask();
-		        cTask.addPropertyChangeListener(this);
+		  //      cTask.addPropertyChangeListener(this);
 		        cTask.execute();
 		        
 		        ValueRegistry.CONTENT_ANALYZED=true;
@@ -99,7 +104,7 @@ public class AuthorTopicVizUI extends JFrame implements ItemListener,PropertyCha
     	
     	protected void done(){
     		try{
-    			JOptionPane.showMessageDialog(null, "Content analysis done.","Finished",JOptionPane.INFORMATION_MESSAGE);
+    			ComponentRegistry.registeredProgressBarFrame.hideUI();
     		}catch(Exception e){
     			
     		}
@@ -107,7 +112,7 @@ public class AuthorTopicVizUI extends JFrame implements ItemListener,PropertyCha
     }
     
     
-    public void propertyChange(PropertyChangeEvent evt){
+  /*  public void propertyChange(PropertyChangeEvent evt){
     	if("progress".equals(evt.getPropertyName())){
     		int progress=(Integer)evt.getNewValue();
     		monitor.setProgress(progress);
@@ -117,7 +122,11 @@ public class AuthorTopicVizUI extends JFrame implements ItemListener,PropertyCha
     		}
     	}
     }
+	*/
 	
+	/**
+	 * Various content panels
+	 */
 	public JPanel getControlPanel(){
 		JPanel mainPanel=new JPanel();
 		mainPanel.setLayout(new BorderLayout());
@@ -139,11 +148,11 @@ public class AuthorTopicVizUI extends JFrame implements ItemListener,PropertyCha
 		
 		tabbedPane.setPreferredSize(new Dimension(400,600));
 		tabbedPane.addTab("Keyword view", keywordView);
-		tabbedPane.addTab("Sentence view", sentenceView);
+//		tabbedPane.addTab("Sentence view", sentenceView);
 		tabbedPane.addTab("Fulltext view", fullTextView);
 		
 		setupKeywordView();
-		setupSentenceView();
+//		setupSentenceView();
 		setupFullTextView();
 		
 		keywordView.setToolTipText("Dislays various keywords found in the conversation\n between two students.");
@@ -167,6 +176,9 @@ public class AuthorTopicVizUI extends JFrame implements ItemListener,PropertyCha
 		keywordArea=new JTextArea();
 		keywordArea.setLineWrap(true);
 		keywordArea.setWrapStyleWord(true);
+		keywordArea.setFont(ValueRegistry.TEXT_FONT);
+		keywordArea.setForeground(ValueRegistry.KEYWORD_COLOR);
+	//	UILib.setColor(keywordArea, ColorLib.getColor(ColorLib.gray(50)), Color.WHITE);
 		scrollPane.setViewportView(keywordArea);
 		
 		keywordView.add(scrollPane,BorderLayout.CENTER);
@@ -197,6 +209,7 @@ public class AuthorTopicVizUI extends JFrame implements ItemListener,PropertyCha
 		fullTextArea=new JTextArea();
 		fullTextArea.setLineWrap(true);
 		fullTextArea.setWrapStyleWord(true);
+		fullTextArea.setFont(ValueRegistry.TEXT_FONT);
 		
 		
 		scrollPane.setViewportView(fullTextArea);
@@ -400,7 +413,7 @@ public class AuthorTopicVizUI extends JFrame implements ItemListener,PropertyCha
     	Set<String>authors=ComponentRegistry.registeredAuthorTopicViz.getAuthorCountMap().keySet();
     	
     	//for each author, get conversation map.  
-    	//Note: this is not entirely correct way since conversations from author A->B and B->A will be counted
+    	//Note: this is not entirely correct since conversations from author A->B and B->A will be counted
     	//But for calculating TF IDF it doesn't matter???
     	
     	for(String author:authors){

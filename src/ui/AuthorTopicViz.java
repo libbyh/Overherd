@@ -371,7 +371,7 @@ public class AuthorTopicViz extends Display{
     			String parentName=originalParent.getString("author");
     			Node nodeTwo=authorNodeMap.get(parentName);
     			if(nodeTwo !=null){
-    				System.out.println("Edge created");
+    		//		System.out.println("Edge created");
     				Edge edge=graph.addEdge(nodeTwo, nodeOne);
     				edge.setString(VisualItem.LABEL, "");
     			}

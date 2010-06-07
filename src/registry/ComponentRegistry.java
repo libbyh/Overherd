@@ -19,6 +19,8 @@ public class ComponentRegistry {
 	public static GlobalTagSet registeredGlobalTagSet;
 	public static HashSet<String>registeredStopWordSet;
 	
+	public static ProgressBarFrame registeredProgressBarFrame=new ProgressBarFrame("Please wait...");
+	
 	//do not instantiate
 	private ComponentRegistry(){
 		
