@@ -105,6 +105,8 @@ public class AuthorTopicVizUI extends JFrame implements ItemListener {
     	protected void done(){
     		try{
     			ComponentRegistry.registeredProgressBarFrame.hideUI();
+    			JOptionPane.showMessageDialog(ComponentRegistry.registeredAuthorTopicViz,
+    					"Double click a student to center him/her. \nClick his/her direct neighbor to view conversations between two students.");
     		}catch(Exception e){
     			
     		}
