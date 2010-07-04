@@ -227,12 +227,15 @@ public class MainUI extends JPanel {
 	}
 	
 	public static void main(String args[]){
-		String inputFile;
+		String inputFile=null;
 		if (args.length==1){
 			inputFile=args[0];
 		}else{
+			System.err.println("Usage: java -jar overheard.jar INPUT_FILE");
+			System.exit(0);
+		}
 		//	inputFile="D:/workspace3/Overherd/data/forumTree5.xml";
-			inputFile="data/forumTree6a.xml";
+		//	inputFile="data/forumTree6a.xml";
 	//	javax.swing.SwingUtilities.invokeLater(new Runnable(){
 	//		public void run(){
 				MainUI ui=new MainUI(inputFile);
@@ -245,6 +248,6 @@ public class MainUI extends JPanel {
 				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	//		}
 	//	});
-		}
+		
 	}
 }

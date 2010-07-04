@@ -393,6 +393,9 @@ public class AuthorTopicVizUI extends JFrame implements ItemListener {
     	}
     	*/
     	
+    	//update the edge size
+    	
+    	
     //	handler.calculateTFIDFForAllWords();
     	setupTFIDF();
     }

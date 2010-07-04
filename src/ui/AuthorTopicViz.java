@@ -74,6 +74,8 @@ import prefuse.visual.sort.TreeDepthItemSorter;
 import registry.ComponentRegistry;
 import registry.ValueRegistry;
 import viz.control.MyAuthorTopicVizNodeControl;
+
+import viz.render.AuthorVizEdgeRenderer;
 import nlp.*;
 
 public class AuthorTopicViz extends Display{
@@ -113,9 +115,11 @@ public class AuthorTopicViz extends Display{
     	
     	//render
     	Renderer nodeR=new ShapeRenderer(20);
+    	AuthorVizEdgeRenderer edgeRenderer=new AuthorVizEdgeRenderer(Constants.EDGE_TYPE_LINE);
     	
     	DefaultRendererFactory drf=new DefaultRendererFactory();
     	drf.setDefaultRenderer(nodeR);
+    	drf.add(new InGroupPredicate(EDGES), edgeRenderer);
     	drf.add(new InGroupPredicate(EDGE_DECORATORS), new LabelRenderer(VisualItem.LABEL));
         drf.add(new InGroupPredicate(NODE_DECORATORS), new LabelRenderer(VisualItem.LABEL));
     	m_vis.setRendererFactory(drf);
@@ -134,7 +138,7 @@ public class AuthorTopicViz extends Display{
     	
     
     	ColorAction nEdges=new ColorAction(EDGES,VisualItem.STROKECOLOR);
-    	nEdges.setDefaultColor(ColorLib.gray(180));
+    	nEdges.setDefaultColor(ColorLib.gray(180,80));
     	
     	//action lists
     //	dFilter=new GraphDistanceFilter(GRAPH,MaxDepth);

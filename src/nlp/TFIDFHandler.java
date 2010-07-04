@@ -120,7 +120,7 @@ public class TFIDFHandler {
     	
     	//for each documents
         for(MyDocument doc:docs){
-           System.out.println("doc----------------------------------");
+        //   System.out.println("doc----------------------------------");
         //    System.out.printf("\n   %18s    %8s\n","Term","Score\n");
             ArrayList<TagWithTFIDF> tags=new ArrayList<TagWithTFIDF>();
             ObjectToCounterMap<String> tf1=tfIdfHandler.termFrequencyVector(doc.getContent());
@@ -146,7 +146,7 @@ public class TFIDFHandler {
             if(tags.size()>0){
             	
             	java.util.Collections.sort(tags, java.util.Collections.reverseOrder());
-            	System.out.println(tags);
+            //	System.out.println(tags);
             	doc.setTagSet(tags);
            // 	System.out.println(tags.get(1));
             }
