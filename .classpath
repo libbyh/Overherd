@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="D:/libraries/Processing/core.jar" sourcepath="D:/libraries/Processing/core.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/D:/processing-1.0.9/processing-1.0.9/reference/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="D:/libraries/prefuse-beta/build/prefuse.jar" sourcepath="D:/libraries/prefuse-beta/build/prefuse.src.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/D:/libraries/prefuse-beta/doc/api/prefuse/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="D:/libraries/jfreechart-1.0.13/lib/jcommon-1.0.16.jar"/>
+	<classpathentry kind="lib" path="D:/libraries/jfreechart-1.0.13/lib/jfreechart-1.0.13.jar" sourcepath="D:/libraries/jfreechart-1.0.13/source/">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/D:/libraries/jfreechart-1.0.13/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="D:/libraries/lingpipe-3.9.1/lingpipe-3.9.1.jar" sourcepath="D:/libraries/lingpipe-3.9.1/src"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
