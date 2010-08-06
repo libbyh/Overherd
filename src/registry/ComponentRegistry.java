@@ -5,6 +5,12 @@ import java.util.HashSet;
 
 import nlp.*;
 import ui.*;
+import ui.authormap.AuthorTopicVizUI;
+import ui.authormap.data.UserConversationMap;
+import ui.authormap.viz.AuthorTopicViz;
+import ui.treemap.MainUI;
+import ui.treemap.viz.TreeMap;
+import util.ProgressBarFrame;
 
 public class ComponentRegistry {
 	public static MainUI registeredMainUI;
