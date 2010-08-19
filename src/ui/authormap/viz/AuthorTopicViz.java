@@ -270,7 +270,7 @@ public class AuthorTopicViz extends Display{
         addControlListener(new FocusControl(2,"filter"));
         addControlListener(new HoverActionControl("repaint"));
         addControlListener(new MyAuthorTopicVizNodeControl());
-     //   addControlListener(new NeighborHighlightControl());
+        addControlListener(new NeighborHighlightControl());
         
         
         this.setToolTipText("Double click a node to center it.\n Click a neighbor node to show the posts between the students.");
@@ -491,11 +491,12 @@ public class AuthorTopicViz extends Display{
         	while(iter.hasNext()){
         		if(((Node)item.getSourceTuple())==(Node)iter.next()){
         			isNeighbor=true;
+        			System.out.println("item is a neighbor");
         			break;
         		}
         	}
         	if((Node)item.getSourceTuple()==getCurrentRootNode()){
-        		return ColorLib.rgb(255,51,0);
+        		return ColorLib.rgb(255,51,102);
         	}
             if ( m_vis.isInGroup(item, Visualization.SEARCH_ITEMS) ){
                 return ColorLib.rgb(255,190,190);
@@ -510,7 +511,7 @@ public class AuthorTopicViz extends Display{
             	return ColorLib.rgba(200,100,33,50);
             }
             else
-            	return ColorLib.rgba(20, 200, 100, 150);//item.getInt("fill_color");
+            	return ColorLib.rgba(204, 204, 0, 220);//item.getInt("fill_color");
         }
         
     }
