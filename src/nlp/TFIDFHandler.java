@@ -25,23 +25,49 @@ import java.util.Set;
 import registry.ComponentRegistry;
 /**
  * TFIDF handler class for posts in a discussion space.
- * Create one for each discussion space
- * @author kevin
+ * 
+ * First, it sets up the tokenizer factories for the text content.  They'll make every word lower case and throw out stop words.
+ * I use an additional stop words list to supplement this as well.
+ * 
+ * A {@link MyDocument} object can be "handled" by this class by adding the object.  All documents need to be added
+ * to this handler before the tf*idf values can be found for each word in each document.
+ *
+ * @author <a href="http://kevinnam.com">kevin nam</a>
  */
+
+
 public class TFIDFHandler {
     
     private TokenizerFactory tokenizerFactory=IndoEuropeanTokenizerFactory.INSTANCE;
-    private MyTfIdfDistance tfIdfHandler=new MyTfIdfDistance(tokenizerFactory);
-    private ArrayList<MyDocument> docs=new ArrayList<MyDocument>();	//keep track of what string docs are added
+    
+    /**
+     * {@link MyTfIdfDistance} class for calculating the cosign simularity value between two documents.
+     */
+    private MyTfIdfDistance tfIdfDistance=new MyTfIdfDistance(tokenizerFactory);
+    
+    /**
+     * Keep track of the added {@link MyDocument} instances.
+     */
+    private ArrayList<MyDocument> docs=new ArrayList<MyDocument>();	
+    
+    /**
+     * Keep track of words and their tf*idf values
+     */
     private HashMap<String,Double>TFIDFScoreMap=new HashMap<String,Double>();
     
 
+    /**
+     * Set up various tokenizers and stopwords.
+     */
     public TFIDFHandler(){
         
+    	//create various tokenizerFactory
         tokenizerFactory=IndoEuropeanTokenizerFactory.INSTANCE;
         tokenizerFactory=new LowerCaseTokenizerFactory(tokenizerFactory);
         tokenizerFactory=new EnglishStopTokenizerFactory(tokenizerFactory);
     //    tokenizerFactory=new PorterStemmerTokenizerFactory(tokenizerFactory);
+        
+        //read in stopwords to be used
         if(ComponentRegistry.registeredStopWordSet==null){
         	ComponentRegistry.registeredStopWordSet=new HashSet<String>();
         }
@@ -57,38 +83,22 @@ public class TFIDFHandler {
     	}
         
         
-   //     System.out.println("Printing stopwords...");
-   //     for(String t:ComponentRegistry.registeredStopWordSet){
-   //     	System.out.println("stopword:"+t);
-   //     }
+   
     }
 
-    /*
-    public void addDoc(String doc){
-    	//process each doc with tokenizers defined in the tokenizerFactory
-        Tokenizer tz=tokenizerFactory.tokenizer(doc.toCharArray(), 0, doc.length());
-        String token;
-        StringBuffer buffer=new StringBuffer();
-        //create a placeholder in the map of token to score 
-        while((token=tz.nextToken())!=null){
-            TFIDFScoreMap.put(token, 0.0);  //initially set all scores to 0.0
-            buffer.append(token);
-            buffer.append(" ");
-        }
-        String newdoc=buffer.toString();
-        
-        //pass the processed doc to handler
-        docs.add(newdoc);
-        tfIdfHandler.handle(newdoc);
-    }
-    */
-
+    
+    /**
+     * Add a {@link MyDocument} instance to the document handler after tokenizing the content.
+     * 
+     * @param doc Mydocument instance
+     */
     public void addDoc(MyDocument doc){
     	//process each doc with tokenizers defined in the tokenizerFactory
     	String content=doc.getContent();
     	Tokenizer tz=tokenizerFactory.tokenizer(content.toCharArray(), 0, content.length());
         String token;
         StringBuffer buffer=new StringBuffer();
+        
         //create a placeholder in the map of token to score 
         while((token=tz.nextToken())!=null){
             TFIDFScoreMap.put(token, 0.0);  //initially set all scores to 0.0
@@ -100,30 +110,41 @@ public class TFIDFHandler {
         //pass the processed doc to handler
         doc.setTokenizedContent(newdoc);
         docs.add(doc);
-        tfIdfHandler.handle(doc);
+        tfIdfDistance.handle(doc);
     }
     
+    /**
+     * Returns the MyTfIdfDistance used here.
+     * @return MyTfIdfDistance instance
+     */
     public MyTfIdfDistance getTfIdf(){
         
-        return this.tfIdfHandler;
+        return this.tfIdfDistance;
     }
     
+    /**
+     * Returns the document list
+     * @return the list of documents added to the handler
+     */
     public ArrayList<MyDocument> getDocs(){
     	return docs;
     }
 
     /**
-     * Calculate tf idf values for each term 
-     * @author kevin
+     * Calculate the tf*idf value for each word and store it into its {@link MyDocument} object where it belongs to. 
+     * 
      */
     public void calculateTFIDFForAllWords(){
     	
-    	//for each documents
+    	//for each documents added to this handler
         for(MyDocument doc:docs){
         //   System.out.println("doc----------------------------------");
         //    System.out.printf("\n   %18s    %8s\n","Term","Score\n");
+        	
+        	//create a tag list to store the tags for this document
             ArrayList<TagWithTFIDF> tags=new ArrayList<TagWithTFIDF>();
-            ObjectToCounterMap<String> tf1=tfIdfHandler.termFrequencyVector(doc.getContent());
+            
+            ObjectToCounterMap<String> tf1=tfIdfDistance.termFrequencyVector(doc.getContent());
             for(Map.Entry<String,Counter>entry:tf1.entrySet()){
                 String term=entry.getKey();
                 
@@ -132,7 +153,7 @@ public class TFIDFHandler {
                 }
                                 
                 Counter counter=entry.getValue();
-                double score=tfIdfHandler.tfIdf(term, counter);
+                double score=tfIdfDistance.tfIdf(term, counter);
                 TagWithTFIDF tag=new TagWithTFIDF(term, score);
                 if(!tags.contains(tag) && !ComponentRegistry.registeredStopWordSet.contains(tag.getTag().toLowerCase())){
                 	tags.add(tag);
@@ -143,7 +164,9 @@ public class TFIDFHandler {
                 
             //    System.out.printf("\n %18s  %8s\n", term, score);
             }
-            if(tags.size()>0){
+            
+            //if there are at least two tags, sort it.
+            if(tags.size()>1){
             	
             	java.util.Collections.sort(tags, java.util.Collections.reverseOrder());
             //	System.out.println(tags);
@@ -152,33 +175,7 @@ public class TFIDFHandler {
             }
         }
         
-        /*
-        System.out.println("check what tags are in the doc and save them");
-        //now that tf-idf values are calculated for all terms, save them to my doc objects
-        Iterator iter=ComponentRegistry.registeredGlobalTagSet.iterator();
-        while(iter.hasNext()){
-        	//for each tag, check whether a doc has the term
        
-        	TagWithTFIDF tag=(TagWithTFIDF)iter.next();
-        	String t=tag.getTag();
-        	if(t.length()==1){
-        		continue;
-        	}
-        	
-        	if(ComponentRegistry.registeredStopWordSet.contains(t)){
-        		continue;
-        	}
-        	System.out.println("checking for:"+tag.getTag());
-        	for(MyDocument doc:docs){
-	        	if(doc.getTokenizedContent().contains(tag.getTag())){
-	        		System.out.println("Doc has the tag");
-	        		doc.addTagWithTFIDF(tag);
-	        	}
-	        	
-	        }
-        	
-        }
-        */
        
     }
 

@@ -6,8 +6,9 @@ import java.util.Iterator;
 import registry.ComponentRegistry;
 
 /**
- * Saves TagWithTFIDFs from the entire document space
- * @author kevin
+ * HashSet class that saves instances of {@link TagWithTFIDF} from the entire document space.
+ * 
+ * @author <a href="http://kevinnam.com">kevin nam</a>
  *
  */
 public class GlobalTagSet {
