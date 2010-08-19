@@ -80,7 +80,23 @@ import ui.treemap.viz.TreeMap;
 
 import nlp.*;
 
+/**
+ * A visualization that displays the authors (students) of the discussion posts and their connections.
+ * A node represents each student.  The size of the node is proportional to the number of the student's posts.
+ * A link between two nodes represents one replied to the other's post.
+ * 
+ * A user of the AuthorTopicViz (and AuthorTopicVizUI in which in appears in) can do the following:
+ * 1) He/she can double click a node to visually center the student, with all the other students 
+ * who talked to the student as neighboring nodes.
+ * 2) Clicking a neighboring node shows the conversation content and keywords in the respective views
+ * in AuthorTopicVizUI
+ *  
+ * @author <a href="http://kevinnam.com">kevin nam</a>
+ *
+ */
 public class AuthorTopicViz extends Display{
+	
+	//Set up names for the data types
 	public static final String GRAPH = "graph";
     public static final String NODES = "graph.nodes";
     public static final String EDGES = "graph.edges";
@@ -89,15 +105,31 @@ public class AuthorTopicViz extends Display{
     public static final String NODE_DECORATORS = "nodeDeco";
     public static final String AGGR_DECORATORS = "aggrDeco";
     
-    
+    //bookkeeping maps
+    /**
+     * Keeps how many posts an author posted.  This is used to determine the size of the node in the visualization. 
+     * Key: the name of the student
+     * Value: the number of the posts
+     */
     private HashMap<String,Integer> authorCountMap;
+    
+    /**
+     * A map between an author and prefuse Node. This is useful when need to access the node for an author.  
+     */
     private HashMap<String,Node> authorNodeMap;	
   
     
+    /**
+     * The prefuse graph data that will have all the nodes and links
+     */
     private Graph graph;
   //  protected final GraphDistanceFilter dFilter;
     protected int MaxDepth=99;
     private VisualGraph g;
+    
+    /**
+     * To keep track of the currently centered node.
+     */
     private static Node currentRootNode;
 
     
@@ -114,8 +146,10 @@ public class AuthorTopicViz extends Display{
     	ComponentRegistry.registeredGlobalTagSet=new GlobalTagSet();
     	initData();
     	
+    	//The following steps are required for prefuse.
+    	//See prefuse documentations for more detail.
     	
-    	//render
+    	//set up various renderers
     	Renderer nodeR=new ShapeRenderer(20);
     	AuthorVizEdgeRenderer edgeRenderer=new AuthorVizEdgeRenderer(Constants.EDGE_TYPE_LINE);
     	
@@ -167,13 +201,7 @@ public class AuthorTopicViz extends Display{
       //  repaint.add(dFilter);
         m_vis.putAction("repaint", repaint);
         
-        
-   /*     ActionList filterRedraw=new ActionList();
-        
-        repaint.add(dFilter);
-        repaint.add(recolor);
-        m_vis.putAction("filterRedraw", filterRedraw);
-     */   
+    
 //      full paint
         ActionList fullPaint = new ActionList();
         fullPaint.add(new NodeColorAction(NODES));
@@ -189,7 +217,7 @@ public class AuthorTopicViz extends Display{
         LabelLayout2 nodeDecoLayout=new LabelLayout2(NODE_DECORATORS);
         AuthorSizeAction authorSizeAction=new AuthorSizeAction();
       
-        //decorator 
+        //set up decorators.  Node decorator shows the student name. 
         ActionList decos=new ActionList();//Action.INFINITY);
         decos.add(edgeDecoLayout);
         decos.add(nodeDecoLayout);
@@ -345,6 +373,12 @@ public class AuthorTopicViz extends Display{
     	return viewPanel;
     }
     
+    
+    /**
+     * Initialize the prefuse graph data 
+     * Create a node for each student, with the size representing the number of the posts.
+     * 
+     */
     public void initData(){
     	graph=new Graph();
     	findUniqueAuthors();	
@@ -439,6 +473,11 @@ public class AuthorTopicViz extends Display{
     	return currentRootNode;
     }
     
+    
+    /**
+     * Set up various color actions associated with a node.
+     * 
+     */
     public class NodeColorAction extends ColorAction {
         
         public NodeColorAction(String group) {
@@ -447,6 +486,14 @@ public class AuthorTopicViz extends Display{
         
         public int getColor(VisualItem item) {
         	
+        	Iterator iter=getCurrentRootNode().neighbors();
+        	boolean isNeighbor=false;
+        	while(iter.hasNext()){
+        		if(((Node)item.getSourceTuple())==(Node)iter.next()){
+        			isNeighbor=true;
+        			break;
+        		}
+        	}
         	if((Node)item.getSourceTuple()==getCurrentRootNode()){
         		return ColorLib.rgb(255,51,0);
         	}
@@ -459,13 +506,19 @@ public class AuthorTopicViz extends Display{
             	return ColorLib.rgba(255,200,125,200);
             } else if(item.isHighlighted()){
             	return ColorLib.rgba(200, 5, 100,190);
+            }else if(isNeighbor){
+            	return ColorLib.rgba(200,100,33,50);
             }
             else
-            	return item.getInt("fill_color");
+            	return ColorLib.rgba(20, 200, 100, 150);//item.getInt("fill_color");
         }
         
     }
     
+    /**
+     * Set size actions, so each node's size varies according to the number of the posts.
+     *
+     */
     public class AuthorSizeAction extends SizeAction {
         public double getSize(VisualItem item) {
         	double y=1.0;
@@ -507,6 +560,11 @@ public class AuthorTopicViz extends Display{
         }
     } // end of inner class LabelLayout
     
+    
+    /**
+     * For testing purposes only...
+     * @param args
+     */
     public static void main(String ... args){
     	JFrame frame=new JFrame();
     	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -522,7 +580,9 @@ public class AuthorTopicViz extends Display{
     
     /**
      * Switch the root of the tree by requesting a new spanning tree
-     * at the desired root
+     * at the desired root.
+     * 
+     * Copied from the prefuse code.
      */
     public static class TreeRootAction extends GroupAction {
         public TreeRootAction(String graphGroup) {

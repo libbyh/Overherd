@@ -4,16 +4,30 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
- * MyDocument class for storing user name, content, a list of tags with tf-idf values
+ * A wrapper class for storing user name, content, tokenized content, a list of tags with tf-idf values
  * 
- * @author kevin
+ * @author <a href="http://kevinnam.com">kevin nam</a>
  *
  */
 public class MyDocument {
-	
+	/**
+	 * Student's name
+	 */
 	private String userName;
+	
+	/**
+	 * The content of a conversation (reply)
+	 */
 	private String content;
+	
+	/**
+	 * Tokenized content filtered through tokenizer factories
+	 */
 	private String tokenizedContent;
+	
+	/**
+	 * A list of tags of type {@link TagWithTFIDF} found from the document.  Each tag has a word and tf*idf value.
+	 */
 	ArrayList<TagWithTFIDF> tags;
 	
 	public MyDocument(String userName,String content, ArrayList<TagWithTFIDF> tags){

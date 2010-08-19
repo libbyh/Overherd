@@ -1,8 +1,4 @@
 package ui.treemap.viz.render;
-/**
- * @author kevin
- * A renderer that renders a node as a rectangle
- */
 
 import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
@@ -10,6 +6,10 @@ import java.awt.geom.Rectangle2D;
 import prefuse.*;
 import prefuse.render.*;
 import prefuse.visual.VisualItem;
+/**
+ * @author <a href="http://kevinnam.com">kevin nam</a>
+ * A renderer that renders a node as a rectangle in the TreeMap
+ */
 
 public class NodeRenderer extends AbstractShapeRenderer {
 	private Rectangle2D m_bounds=new Rectangle2D.Double();

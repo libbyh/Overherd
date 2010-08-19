@@ -1,10 +1,6 @@
 package ui.chart;
 
-/**
- * 
- * @author kevin
- * Chart for the data
- */
+
 
 import ui.*;
 import ui.treemap.viz.TreeMap;
@@ -31,9 +27,21 @@ import org.jfree.data.time.*;
 import org.jfree.data.xy.*;
 import org.jfree.ui.*;
 
+/**
+ * A customized JFreeChart graph for showing the number of new posts at a time period.
+ * See the documentaions for JFreeChart for more detail.
+ * 
+ * Currently has a slight error in displaying the date.
+ *  
+ * @author <a href="http://kevinnam.com">kevin nam</a>
+ */
 public class TimeChart extends ApplicationFrame {
 	private TreeMap associatedTreeMap=null;
 	private int step;
+	
+	/**
+	 * To map a date with the number of the posts
+	 */
 	private HashMap<String,Integer> dateHash=new HashMap<String,Integer>();
 	private XYDataset dataset;
 	private JFreeChart chart;
@@ -61,9 +69,7 @@ public class TimeChart extends ApplicationFrame {
 		setContentPane(chartPanel);
 	}
 	
-	/**
-	 * 
-	 */
+	
 	public static JFreeChart createChart(XYDataset dataset){
 		JFreeChart chart=ChartFactory.createTimeSeriesChart(
 				null,
@@ -116,16 +122,13 @@ public class TimeChart extends ApplicationFrame {
 				long time=item.getLong("epoch_seconds");
 				time=time*1000;
 				if(time>0){
-				//	System.out.println("time:"+time);
-				//	Date date=new Date(time);
+				
 					Calendar c=Calendar.getInstance();
 					c.setTimeInMillis(time);
-				//	System.out.println("Cal: "+c.toString());
+				
 					String key=c.get(Calendar.DAY_OF_MONTH) + " " + 
 					(c.get(Calendar.MONTH)) + " " + c.get(Calendar.YEAR);
-				//	System.out.println("converted key: "+ time + ", "+key);
-				//	String ds=df.format(date);
-				//	System.out.println("date:"+ds);
+				
 					if(dateHash.containsKey(key)){
 						dateHash.put(key, dateHash.get(key)+1);
 					}else{
@@ -136,22 +139,17 @@ public class TimeChart extends ApplicationFrame {
 			
 			for (String key : dateHash.keySet()){
 				int num=dateHash.get(key);
-			//	System.out.println(key + " : " + dateHash.get(key));
+			
 				Calendar c=Calendar.getInstance();
 				String[] data=key.split("\\s");
 				c.set(Integer.parseInt(data[2]), (Integer.parseInt(data[1])),
 						Integer.parseInt(data[0]));
-			//	System.out.println(c);
-			//	try{
-			//		c=df.parse(key);
-			//	}catch(ParseException pe){
-			//		pe.printStackTrace();
-			//	}
+			
 				System.out.println("adding " + c.get(Calendar.DATE) + " "+
 						(c.get(Calendar.MONTH)+1) +" " + c.get(Calendar.YEAR));
 				ts.add(new Day(c.get(Calendar.DATE), (c.get(Calendar.MONTH)+1), c.get(Calendar.YEAR)),
 						num);
-			//
+			
 				
 			}
 			dataset.addSeries(ts);

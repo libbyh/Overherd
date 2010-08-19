@@ -10,6 +10,12 @@ import prefuse.visual.VisualItem;
 import ui.*;
 import ui.treemap.MainUI;
 
+/**
+ * Sets up various controllers for mouse activities on a node in the TreeMap.
+ * 
+ * @author <a href="http://kevinnam.com">kevin nam</a>
+ *
+ */
 public class MyNodeControl extends ControlAdapter {
 	private MainUI associatedMainUI=null;
 	private JTextPane associatedTextPane=null;
@@ -19,7 +25,9 @@ public class MyNodeControl extends ControlAdapter {
 		this.associatedTextPane=ui.getViewerTextPane();
 	}
 	
-	
+	/**
+	 * When the mouse cursor enters a node, show the topic date
+	 */
 	public void itemEntered(VisualItem item, MouseEvent e){
 	//	title.setText(item.getString(label));
 		if(item.canGetString("type")){

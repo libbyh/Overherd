@@ -17,6 +17,14 @@ import prefuse.util.*;
 import registry.*;
 import ui.authormap.data.UserConversationMap;
 
+/**
+ * You can use this class to set the size of the edges.
+ * Originally I tried to vary the thickness of an edge according to the number of
+ * connections, but it didn't look nice.  For now it's just binary.
+ * 
+ * @author <a href="http://kevinnam.com">kevin nam</a>
+ *
+ */
 public class AuthorVizEdgeRenderer extends EdgeRenderer {
 	
 	public AuthorVizEdgeRenderer(){
@@ -34,6 +42,8 @@ public class AuthorVizEdgeRenderer extends EdgeRenderer {
 	 */
 	protected double getLineWidth(VisualItem item){
 		return 1.0;
+		
+		//the following code shows how to vary the thickness according to the number of connections
 		/*
 		double width=0.0;
 		EdgeItem edge=(EdgeItem)item;

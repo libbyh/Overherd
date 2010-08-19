@@ -12,8 +12,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Based on aliasi
- * @author 
+ * Based on aliasi's TfIdfDistance class.
+ * Handles customized MyDocument class.
+ * 
  */
 public class MyTfIdfDistance extends TokenizedDistance
     implements com.aliasi.corpus.TextHandler {
@@ -77,6 +78,10 @@ public class MyTfIdfDistance extends TokenizedDistance
 
     }
     
+    /**
+     * Handles a {@link MyDocument} document.
+     * @param doc The document to process.
+     */
     public void handle(MyDocument doc){
     	handle(doc.getContent());
     }

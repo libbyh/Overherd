@@ -1,5 +1,6 @@
 package ui.authormap;
 
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -33,12 +34,21 @@ import ui.authormap.viz.AuthorTopicViz;
 import ui.treemap.viz.TreeMap;
 
 
+/**
+ * User interfaces for visualizing students (authors) and their conversations.
+ * 
+ * Each node represents a student.  A link connects two nodes if the two students had a conversation (i.e., one replied to 
+ * another's post).
+ * 
+ * A user can double click a node to center it.  The node's neighbor nodes represents all the students with whom the
+ * centered student had a conversation with.  Clicking a neighbor node shows their conversations and keywords in the
+ * respective views.
+ * 
+ */
 public class AuthorTopicVizUI extends JFrame implements ItemListener {
 
-	private JCheckBox directAuthorsCheck;
 	private JTabbedPane tabbedPane=new JTabbedPane();
 	private JPanel keywordView=new JPanel();
-//	private JPanel keywordView2=new JPanel();
 	private JPanel sentenceView=new JPanel();
 	private JPanel fullTextView=new JPanel();
 	
@@ -53,7 +63,6 @@ public class AuthorTopicVizUI extends JFrame implements ItemListener {
 	
 
     private ContentAnalysisTask cTask;
-  //  private ProgressMonitor monitor;
 	private JProgressBar progressBar=new JProgressBar(0,100);
     
 	JCheckBox showTopicsCheck;
@@ -82,23 +91,23 @@ public class AuthorTopicVizUI extends JFrame implements ItemListener {
 	
 	public void showUI(){
 		 if(!ValueRegistry.CONTENT_ANALYZED){
-		  /*      monitor=new ProgressMonitor(null,"Content analysis in progress.  Please wait...","",0,100);
-		        monitor.setMillisToDecideToPopup(0);
-		        monitor.setMillisToPopup(1500);
-		        monitor.setProgress(0);
-		    */    
-			 	
-		        ComponentRegistry.registeredProgressBarFrame.showUI("Please wait while analyzing content...");
-		        cTask=new ContentAnalysisTask();
-		  //      cTask.addPropertyChangeListener(this);
-		        cTask.execute();
-		        
-		        ValueRegistry.CONTENT_ANALYZED=true;
-	        }
+		    ComponentRegistry.registeredProgressBarFrame.showUI("Please wait while analyzing content...");
+	        cTask=new ContentAnalysisTask();
+	        cTask.execute();
+	        
+	        ValueRegistry.CONTENT_ANALYZED=true;
+        }
 		 
 		 this.setVisible(true);
 	}
 	
+	/**
+	 * ContentAnalysisTask that analyzes the conversations and calculates the tf*idf values for the words
+	 * Since it's a time consuming work, I use a SwingWorker class.
+	 * 
+	 * @author <a href="http://kevinnam.com">kevin nam</a>
+	 *
+	 */
 	class ContentAnalysisTask extends SwingWorker<Void, String>{
     	public Void doInBackground(){
     		setupContentAnalysis();
@@ -116,48 +125,27 @@ public class AuthorTopicVizUI extends JFrame implements ItemListener {
     	}
     }
     
-    
-  /*  public void propertyChange(PropertyChangeEvent evt){
-    	if("progress".equals(evt.getPropertyName())){
-    		int progress=(Integer)evt.getNewValue();
-    		monitor.setProgress(progress);
-    		
-    		if(monitor.isCanceled()||cTask.isDone()){
-    			
-    		}
-    	}
-    }
-	*/
 	
 	/**
-	 * Various content panels
+	 * Various content panels that show conversations and keywords
 	 */
 	public JPanel getControlPanel(){
 		JPanel mainPanel=new JPanel();
 		mainPanel.setLayout(new BorderLayout());
-	//	Box cBox=new Box(BoxLayout.Y_AXIS);
-		
+	
 		mainPanel.setSize(200, 800);
-		
-//		directAuthorsCheck=new JCheckBox("Show only direct authors");
-//		directAuthorsCheck.setSelected(false);
-//		directAuthorsCheck.addItemListener(this);
-		
+			
 		showTopicsCheck=new JCheckBox("Show topics discussed");
 		showTopicsCheck.setSelected(false);
 		showTopicsCheck.addItemListener(this);
 		
 		mainPanel.add(new JLabel("- Conversation viewer -"), BorderLayout.NORTH);
-	//	cBox.add(directAuthorsCheck);
-	//	cBox.add(showTopicsCheck);
-		
+	
 		tabbedPane.setPreferredSize(new Dimension(400,600));
 		tabbedPane.addTab("Keyword view", keywordView);
-//		tabbedPane.addTab("Sentence view", sentenceView);
 		tabbedPane.addTab("Fulltext view", fullTextView);
 		
 		setupKeywordView();
-//		setupSentenceView();
 		setupFullTextView();
 		
 		keywordView.setToolTipText("Dislays various keywords found in the conversation\n between two students.");
@@ -169,10 +157,10 @@ public class AuthorTopicVizUI extends JFrame implements ItemListener {
 	}
 	
 	/**
-	 * Sets up keyword view panel
+	 * Sets up the keyword view panel
 	 */
 	public void setupKeywordView(){
-	//	keywordView.add(ComponentRegistry.registeredAuthorTopicViz.setupKeywordView());
+	
 		this.keywordView.setLayout(new BorderLayout());
 		this.keywordViewLabel=new JLabel("Click a student to center and hover over another to see conversation.");
 		this.keywordView.add(keywordViewLabel,BorderLayout.NORTH);
@@ -183,7 +171,7 @@ public class AuthorTopicVizUI extends JFrame implements ItemListener {
 		keywordArea.setWrapStyleWord(true);
 		keywordArea.setFont(ValueRegistry.TEXT_FONT);
 		keywordArea.setForeground(ValueRegistry.KEYWORD_COLOR);
-	//	UILib.setColor(keywordArea, ColorLib.getColor(ColorLib.gray(50)), Color.WHITE);
+	
 		scrollPane.setViewportView(keywordArea);
 		
 		keywordView.add(scrollPane,BorderLayout.CENTER);
@@ -205,6 +193,9 @@ public class AuthorTopicVizUI extends JFrame implements ItemListener {
 		return this.tabbedPane.getSelectedIndex();
 	}
 	
+	/**
+	 * Sets us the fullTextView that shows the entire conversations with keywords highlighted
+	 */
 	public void setupFullTextView(){
 		this.fullTextView.setLayout(new BorderLayout());
 		fullTextViewLabel=new JLabel("Click a student to center and hover over another to see conversation.");
@@ -230,10 +221,12 @@ public class AuthorTopicVizUI extends JFrame implements ItemListener {
 		return this.fullTextArea;
 	}
 	
+	// not used at the moment
 	public void itemStateChanged(ItemEvent e){
 		Object source=e.getItemSelectable();
 		AuthorTopicViz display=getAuthorTopicViz();
 		Visualization viz=display.getVisualization();
+		/*
 		if(source==directAuthorsCheck){
 			if(e.getStateChange()==ItemEvent.SELECTED){
 			//	display.dFilter.setDistance(1);
@@ -249,6 +242,7 @@ public class AuthorTopicVizUI extends JFrame implements ItemListener {
 				
 			}
 		}
+		*/
 	}
 	
 	/**
@@ -373,7 +367,7 @@ public class AuthorTopicVizUI extends JFrame implements ItemListener {
     				targetMap.getConversationMap().put(sourceAuthor, mList);
     			}
     		}
-    //		sourceMap.addConversationForUser(targetAuthor, conversation)
+   
     		countDone+=1;
     	}
     	
@@ -422,7 +416,7 @@ public class AuthorTopicVizUI extends JFrame implements ItemListener {
     	
     	//for each author, get conversation map.  
     	//Note: this is not entirely correct since conversations from author A->B and B->A will be counted
-    	//But for calculating TF IDF it doesn't matter???
+    	//But for calculating tf*idf, it doesn't matter???
     	
     	for(String author:authors){
     		UserConversationMap cMap=ComponentRegistry.registeredUserMatrix.get(author);

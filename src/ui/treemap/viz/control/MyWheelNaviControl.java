@@ -1,16 +1,6 @@
 package ui.treemap.viz.control;
 
-/**
- * @author kevin
- * Mouse wheel control for moving up and down the tree depth.
- * In a TreeMap, only the leaf nodes are selectable and clickable, and you can't 
- * select a parent node.  
- * 
- * This control allows a user to select the parent node of a node by scrolling the mousewheel.
- * Scrolling up selects the parent, scrolling down from the parent selects the child.
- * 
- * Since it's not very obvious this feature exists in the viz, some indication may be needed.
- */
+
 
 import java.awt.Point;
 import java.awt.event.MouseWheelEvent;
@@ -24,6 +14,17 @@ import prefuse.visual.NodeItem;
 import prefuse.visual.VisualItem;
 import ui.treemap.MainUI;
 
+/**
+ * @author <a href="http://kevinnam.com">kevin nam</a>
+ * Mouse wheel control for moving up and down the tree depth.
+ * In a TreeMap, only the leaf nodes are selectable and clickable, and you can't 
+ * select a parent node.  
+ * 
+ * This control allows a user to select the parent node of a node by scrolling the mousewheel.
+ * Scrolling up selects the parent, scrolling down from the parent selects the child.
+ * 
+ * Since it's not very obvious this feature exists in the viz, some indication may be needed.
+ */
 public class MyWheelNaviControl extends ControlAdapter {
 	private Point m_point = new Point();
 	private NodeItem currentParentItem=null;    
@@ -47,7 +48,7 @@ public class MyWheelNaviControl extends ControlAdapter {
         Node parent=node.getParent();
         VisualItem parentViz=(VisualItem)parent;
         
-        //if scrolling up
+        //if scrolling up, get the parent
         if(e.getWheelRotation()<0){
         	 if(previousInvokingItem!=null){             
          		if(currentParentItem!=null){
@@ -102,7 +103,7 @@ public class MyWheelNaviControl extends ControlAdapter {
          //    System.out.println(parent);
              parentItem.getVisualization().repaint();
              parentItem.getVisualization().run("colors");
-        }else{
+        }else{	// if scrolling down, get the child
         	
         	if(currentParentItem != null){
 	        	currentParentItem.setHighlighted(false);

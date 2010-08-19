@@ -7,6 +7,11 @@ import javax.swing.JProgressBar;
 
 import registry.ComponentRegistry;
 
+/**
+ * A progress bar that appears while performing a content analysis 
+ * @author <a href="http://kevinnam.com">kevin nam</a>
+ *
+ */
 public class ProgressBarFrame extends JFrame{
 	private JProgressBar pbar=new JProgressBar(0,100);
 	public ProgressBarFrame(String title){

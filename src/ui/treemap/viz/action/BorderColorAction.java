@@ -1,14 +1,16 @@
 package ui.treemap.viz.action;
-/**
- * 
- * @author kevin
- * A customized border color action
- */
 
 import prefuse.action.assignment.*;
 import prefuse.util.ColorLib;
 import prefuse.visual.NodeItem;
 import prefuse.visual.VisualItem;
+
+/**
+ * 
+ * @author <a href="http://kevinnam.com>kevin name</a>
+ * A customized border color action for a node in the TreeMap
+ * Change the color of the border according to the depth of the node.
+ */
 
 public class BorderColorAction extends ColorAction {
 	public BorderColorAction(String group){

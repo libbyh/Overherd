@@ -1,12 +1,5 @@
 package ui.treemap;
 
-/**
- * @author kevin nam
- * @version 0.1
- * 
- * The main user interfaces.
- * It has three components.  1) the treemap display 2) viewer for content 3) controller
- */
 
 import ui.authormap.AuthorTopicVizUI;
 import ui.authormap.viz.AuthorTopicViz;
@@ -32,6 +25,17 @@ import registry.ComponentRegistry;
 
 import ui.treemap.viz.control.*;
 
+
+/**
+ * The main user interfaces.  It consists of three components.  
+ * 1) a treemap display that shows topics and reply posts in a tree map.
+ * 2) a viewer for the content of each reply
+ * 3) controllers for changing various viewing options
+ * 
+ * @author <a href="http://kevinnam.com">kevin nam</a>
+ * 
+ */
+
 public class MainUI extends JPanel {
 	private int width=1000;
 	private int height=1900;
@@ -56,24 +60,22 @@ public class MainUI extends JPanel {
 		createAndShowGUI("name");
 	}
 	
+	/**
+	 * Initialize and set up the main GUI.
+	 * 
+	 * @param label the data column to be used as a label
+	 */
 	public void createAndShowGUI(final String label){
-	//	this.setSize(width, height);
-		
-	//	this.setVisible(true);
-	//	this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	
 		Tree tree=null;
 		try{
+			//create a tree data structure
 			tree=(Tree)new TreeMLReader().readGraph(inputFile);
 		}catch(Exception e){
 			e.printStackTrace();
 			System.exit(1);
 		}
-		
-	//	if(tree!=null){
-	//		JPrefuseTree ft=new JPrefuseTree(new Tree(), label);
-	//	ft.showTreeWindow(tree, "name");
-	//	}
+
 		final TreeMap treemap=new TreeMap(tree, label);
 		treemap.associatedMainUI=this;
 		JSearchPanel searchPanel=treemap.getSearchQuery().createSearchPanel(true);
@@ -119,7 +121,7 @@ public class MainUI extends JPanel {
 		this.setLayout(new BorderLayout());
 		this.add(panel, BorderLayout.CENTER);
 		
-		//Viewer
+		//Set up content viewer for the conversation
 		
 		JPanel viewerPanel=new JPanel(new BorderLayout());
 		viewerPanel.setPreferredSize(new Dimension(280,700));
@@ -151,7 +153,7 @@ public class MainUI extends JPanel {
 		
 		
 		
-		//chart
+		//set up JFreeChart
 		JPanel cPanel=new JPanel();
 	//	cPanel.setPreferredSize(new Dimension(800,170));
 		cPanel.setLayout(new BorderLayout());
@@ -232,6 +234,10 @@ public class MainUI extends JPanel {
 		return ComponentRegistry.registeredAuthorTopicViz;
 	}
 	
+	/**
+	 * Start the program
+	 * @param args the TreeML data file for a discussion space
+	 */
 	public static void main(String args[]){
 		String inputFile=null;
 		if (args.length==1){
@@ -240,20 +246,16 @@ public class MainUI extends JPanel {
 			System.err.println("Usage: java -jar overheard.jar INPUT_FILE");
 			System.exit(0);
 		}
-		//	inputFile="D:/workspace3/Overherd/data/forumTree5.xml";
-		//	inputFile="data/forumTree6a.xml";
-	//	javax.swing.SwingUtilities.invokeLater(new Runnable(){
-	//		public void run(){
-				MainUI ui=new MainUI(inputFile);
-				JFrame frame=new JFrame(" o v e r h e r d | v i s u a l i z a t i o n ");
-				frame.setSize(1100, 1000);
-		//		frame.pack();
-				frame.setLayout(new BorderLayout());
-				frame.getContentPane().add(ui);
-				frame.setVisible(true);
-				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	//		}
-	//	});
+
+		MainUI ui=new MainUI(inputFile);
+		JFrame frame=new JFrame(" o v e r h e r d | v i s u a l i z a t i o n ");
+		frame.setSize(1100, 1000);
+//		frame.pack();
+		frame.setLayout(new BorderLayout());
+		frame.getContentPane().add(ui);
+		frame.setVisible(true);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
 		
 	}
 }

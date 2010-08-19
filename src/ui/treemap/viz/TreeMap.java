@@ -41,7 +41,7 @@ import java.util.*;
 
 
 /**
- * The main TreeMap display class for the forum data, based on the TreeMap demo.
+ * The main TreeMap display class for the forum discussion data, based on the prefuse TreeMap demo.
  * 
  * @author <a href="http://kevinnam.com">kevin nam</a> 
  * 
@@ -59,8 +59,15 @@ public class TreeMap extends Display {
 	private SearchQueryBinding searchQuery;
 	private int width=800;
 	private int height=700;
+	
+	/**
+	 * A slider ui for changing the date intervals when showing the data 
+	 */
 	private JRangeSlider slider;
-	private Display thisInstance;
+	
+	/**
+	 * A prefuse predicate for selecting depth of a node
+	 */
 	private MyOrPredicate depthFilter=null;
 	public MainUI associatedMainUI;
 	private VisualTree vt;
@@ -68,6 +75,9 @@ public class TreeMap extends Display {
 	
 	private int maxDepth=0;
 	
+	/**
+	 * Set up the label schema
+	 */
 	private static final Schema LABEL_SCHEMA=PrefuseLib.getVisualItemSchema();
 	static{
 		LABEL_SCHEMA.setDefault(VisualItem.INTERACTIVE, false);
@@ -102,7 +112,7 @@ public class TreeMap extends Display {
 		//m_vis the the initalized Visualization
 		vt=m_vis.addTree(tree, t);
 		dataTree=t;
-		thisInstance=this;
+		
 		m_vis.setVisible(edges, null, false);
 		
 		//only leaf nodes are interactive
@@ -151,14 +161,7 @@ public class TreeMap extends Display {
 				item.getVisualization().repaint();
 				NodeItem nitem=(NodeItem)item;
 				Iterator iter=nitem.edges();
-			//	while(iter.hasNext()){
-			//		EdgeItem eitem=(EdgeItem)iter.next();
-					//System.out.println(eitem);
-			//		NodeItem sibling=eitem.getAdjacentItem(nitem);
-			//		System.out.println(sibling);
-			//		sibling.setHighlighted(true);
-			//		sibling.getVisualization().repaint();
-			//	}
+		
 			}
 			
 			public void itemExited(VisualItem item, MouseEvent e){
@@ -169,11 +172,7 @@ public class TreeMap extends Display {
 			}
 		});
 		
-	//	this.addControlListener(new NeighborHighlightControl());
-	//	this.addControlListener(new MyWheelNaviControl(this.associatedMainUI));
-	//	this.addControlListener(new WheelZoomControl());
-		
-		
+
 		searchQuery=new SearchQueryBinding(vt.getNodeTable(), label);
 		m_vis.addFocusGroup(Visualization.SEARCH_ITEMS, searchQuery.getSearchSet());
 		
@@ -206,10 +205,9 @@ public class TreeMap extends Display {
 		}
 		System.out.println("min: " + min);
 		System.out.println("max: " + max);
-	//	min-=1000;
-	//	max+=1000;
+	
 		rQ.getNumberModel().setValueRange(min, max, min, max);
-	//	filter.add(rQ.getPredicate());
+	
 		
 		ActionList update=new ActionList();
 		

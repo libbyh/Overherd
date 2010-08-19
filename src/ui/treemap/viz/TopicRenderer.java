@@ -1,23 +1,26 @@
 package ui.treemap.viz;
 
-/**
- * 
- * @author kevin
- * Topic renderer for rendering title label for the topic
- */
+
 
 import java.util.Iterator;
 
 import prefuse.render.*;
 import prefuse.visual.*;
 
+/**
+ * 
+ * @author <a href="http://kevinnam.com">kevin nam</a>
+ * Topic renderer for rendering title label for the topic in the TreeMap
+ */
 public class TopicRenderer extends LabelRenderer {
 	
 	public TopicRenderer(String field){
 		super(field);
 	}
 	
-	@Override
+	/**
+	 * Get the label from the data column named "name"
+	 */
 	protected String getText(VisualItem item){
 	
 		StringBuffer tempBuff=new StringBuffer();

@@ -1,8 +1,5 @@
 package ui.treemap.viz.layout;
-/**
- * @author kevin
- * A label decorator layout
- */
+
 
 import java.util.Iterator;
 
@@ -11,7 +8,11 @@ import prefuse.action.layout.*;
 import prefuse.visual.DecoratorItem;
 import prefuse.visual.VisualItem;
 
-
+/**
+ * @author <a href="http://kevinnam.com">kevin nam</a>
+ * A label decorator layout that dictates where the author name should appear.
+ * Currently, it appears at the center of the node.
+ */
 public class LabelLayout extends Layout{
 	public LabelLayout(String group){
 		super(group);

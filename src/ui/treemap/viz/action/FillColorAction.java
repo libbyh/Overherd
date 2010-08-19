@@ -1,9 +1,4 @@
 package ui.treemap.viz.action;
-/**
- * 
- * @author kevin
- * A customized fill color action.
- */
 
 import prefuse.Visualization;
 import prefuse.action.assignment.*;
@@ -11,6 +6,14 @@ import prefuse.util.ColorLib;
 import prefuse.util.ColorMap;
 import prefuse.visual.NodeItem;
 import prefuse.visual.VisualItem;
+
+/**
+ * 
+ * @author <a href="http://kevinnam.com>kevin nam</a>
+ * A customized fill color action for a node in the TreeMap.
+ * 
+ * Sets the colors for various conditions such as the default, selected, searched, etc.
+ */
 
 public class FillColorAction extends ColorAction {
 	public FillColorAction(String group){
