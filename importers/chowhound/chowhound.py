@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 import httplib2, time, re
 from BeautifulSoup import BeautifulSoup
 from elementtree.ElementTree import Element, SubElement, ElementTree
@@ -80,10 +81,14 @@ def getPostContent(soup): # post_soup ok, good_reply soup ok.
         content = content + p
     """ 
     post = soup.find('div', 'post_body')
-    content_list = post.findAll(text = True)
+    #content_list = post.findAll()
+    content_list = post.contents
     content = ""
     for item in content_list:
-        content = content + item
+        content = content + str(item)
+    content = content.replace("<p>", " ")
+    content = content.replace("</p>", " ")
+    content = content.replace("<br />", "\n")
     return content
     
 def getADT(soup, level = 1): #soup is good reply
@@ -213,7 +218,7 @@ def main():
     
     first_topic = 0 
     if testing == "y":
-        first_topic = 40
+        first_topic = 48
     
     start = time.time()
     page = fetch(url,"GET")
@@ -226,33 +231,30 @@ def main():
     tree_name = "tree" + board_number + ".xml" 
     f3 = open(tree_name, "w")
     overherd = Element("overherd")
-    middle = time.time()
     for i in range(first_topic, len(urls)):
         page = fetch(urls[i], "GET")
         soup = BeautifulSoup(page[1])
         add(overherd, soup, 0)
 
-    
+     
     ElementTree(overherd).write(f3)
 
     end = time.time()
-    print middle-start
-    print end-middle
     print "total time ",end-start
     global ftime
     sum1 = 0
     for item in ftime:
         sum1 = sum1 + item
-    global rtime
-    sum2 = 0
-    for item in rtime:
-        sum2 = sum2 + item
-    print "have reply time ",sum2
     print "fetch time ",sum1    
-    sum2=0
+    global rtime
+    sum1 = 0
+    for item in rtime:
+        sum1 = sum1 + item
+    print "haveReply time ",sum1
+    sum1=0
     for item in atime:
-        sum2 = sum2 +item
-    print "add time ",sum2
+        sum1 = sum1 +item
+    print "add time ",sum1
     
     #f2.close()
     f3.close()
