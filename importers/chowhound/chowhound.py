@@ -70,16 +70,6 @@ def goodDigit(input):
     return string[i:j+1]
 
 def getPostContent(soup): # post_soup ok, good_reply soup ok.
-    """ input a soup, will return content string """
-    """ 
-    post = soup.findAll('div', 'post_body', limit = 1)[0]
-    content = ""
-    for x in range(1, len(post.contents)):
-        p = ""
-        for item in post.contents[x].contents:
-            p = p + str(item)
-        content = content + p
-    """ 
     post = soup.find('div', 'post_body')
     #content_list = post.findAll()
     content_list = post.contents
@@ -91,22 +81,43 @@ def getPostContent(soup): # post_soup ok, good_reply soup ok.
     content = content.replace("<br />", "\n")
     return content
     
-def getADT(soup, level = 1): #soup is good reply
+def getADT(soup): #soup is good reply
     """ input a soup , return author date time,
     A author, D data, T time
     """
+    '''
     if level == 0:
         adt = soup.findAll('p', 'vcard author', limit = 1)[0]
         author = str(adt.strong.contents[0].string)
     else: # if it is a reply
+
         adt = soup.findAll('p', 'vcard author', limit = 1)[0]
         if len(adt.strong.contents) == 1:
             author = str(adt.strong.contents[0].string)
         else:
             author = str(adt.strong.contents[1].string)
-    # above code exists as the vcard block for post and reply are different     
-    date = goodString( adt.strong.nextSibling.string[5:] ) # data is the same. 
-    return author, date
+    # above code exists as the vcard block for post and reply are different     adt = soup.findAll('p', 'vcard author', limit = 1)[0]
+    '''
+    adt = soup.findAll('p', 'vcard author', limit = 1)[0]
+    if len(adt.strong.contents) == 1:
+        author = str(adt.strong.contents[0].string)
+    else:
+        author = str(adt.strong.contents[1].string)
+    # above, author done 
+    datetime = goodString( adt.strong.nextSibling.string[5:] )
+    date = datetime[8:12]+"-"+datetime[0:3]+"-"+datetime[4:6]
+    month_dic = {"Jan":"01", "Feb":"02", "Mar":"03", "Apr":"04", \
+            "May":"05", "Jun":"06", "Jul":"07", "Aug":"08", "Sep":"09", \
+            "Oct":"10", "Nov":"11", "Dec":"12"}
+    for k,v in month_dic.iteritems():
+        date = date.replace(k, v)
+    # above replace month with nuerical value, date done
+    hh = datetime[13:15]
+    if datetime[-2:] == "PM" and hh != "12":
+        hh = str(int(hh)+12)
+    mmss = ":"+datetime[16:18]+":00"
+    time = hh + mmss
+    return author, date, time
 
 def getID(soup):
     global id_list
@@ -140,14 +151,15 @@ def add(parent_e, post_soup, level = 1):
             return
         SubElement(post_soup_e, "id").text = the_id
     
-        (author, date) = getADT(post_soup, 0)
+        (author, date, post_time) = getADT(post_soup)
         SubElement(post_soup_e, "author").text = author
         SubElement(post_soup_e, "date").text = date
+        SubElement(post_soup_e, "time").text = post_time
         content = getPostContent(post_soup)
         SubElement(post_soup_e, "content").text = content
-        SubElement(post_soup_e, "char_count").text = str(len(content))
-        word_count = len(content.split(" "))
-        SubElement(post_soup_e, "word_count").text = str(word_count)
+        #SubElement(post_soup_e, "char_count").text = str(len(content))
+        #word_count = len(content.split(" "))
+        #SubElement(post_soup_e, "word_count").text = str(word_count)
     else:
         post_soup_e = SubElement(parent_e, "reply")
     
@@ -156,16 +168,27 @@ def add(parent_e, post_soup, level = 1):
             return
         SubElement(post_soup_e, "id").text = the_id
     
-        (author, date) = getADT(post_soup)
+        (author, date, post_time) = getADT(post_soup)
         SubElement(post_soup_e, "author").text = author
         SubElement(post_soup_e, "date").text = date
+        SubElement(post_soup_e, "time").text = post_time
         content = getPostContent(post_soup)
         SubElement(post_soup_e, "content").text = content
     SubElement(post_soup_e, "char_count").text = str(len(content))
     word_count = len(content.split(" "))
     SubElement(post_soup_e, "word_count").text = str(word_count)    
     
-    
+    num,sub_soup_list =  haveReply(post_soup, num = 2)  
+    if num !=0:
+        sub_soup = sub_soup_list[0]
+        num = len( sub_soup.findNextSiblings('li') )
+        for i in range(0, num + 1):
+            add(post_soup_e, sub_soup)
+            if len(sub_soup.findNextSiblings('li', limit = 2)) != 0:
+                sub_soup = sub_soup.findNextSiblings('li', limit = 2)[0]
+
+    # 
+    """
     if haveReply(post_soup) != 0: # haveReply?  == have <li>...</li> ?
         sub_soup = haveReply(post_soup, num = 0)[0]
         num = len( sub_soup.findNextSiblings('li') )
@@ -175,9 +198,12 @@ def add(parent_e, post_soup, level = 1):
         for i in range(0, num + 1):
             add(post_soup_e, sub_soup)
             if len(sub_soup.findNextSiblings('li', limit = 2)) != 0:
-             sub_soup = sub_soup.findNextSiblings('li', limit = 2)[0]
+                sub_soup = sub_soup.findNextSiblings('li', limit = 2)[0]
         #add(post_soup_e, sub_soup)
-    
+    """
+    #
+
+
     end = time.time()
     global atime
     atime.append(end - start)
