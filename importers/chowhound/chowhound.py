@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-import httplib2, time, re
+import httplib2, time, re, htmlentitydefs
 from BeautifulSoup import BeautifulSoup
 from elementtree.ElementTree import Element, SubElement, ElementTree
 
@@ -10,7 +10,6 @@ SCRAPING_CACHE_FOR = 60 * 15
 SCRAPING_REQUEST_STAGGER = 1100
 SCRAPING_CACHE = {} 
 
-id_list = []
 
 ftime=[]
 
@@ -79,25 +78,18 @@ def getPostContent(soup): # post_soup ok, good_reply soup ok.
     content = content.replace("<p>", " ")
     content = content.replace("</p>", " ")
     content = content.replace("<br />", "\n")
-    return content
+    return fixup(content)
+
+def fixup(text):
+    """ html entities to string """
+    fixed = BeautifulSoup(text, convertEntities = \
+            BeautifulSoup.HTML_ENTITIES).contents[0]
+    return fixed
     
 def getADT(soup): #soup is good reply
     """ input a soup , return author date time,
     A author, D data, T time
     """
-    '''
-    if level == 0:
-        adt = soup.findAll('p', 'vcard author', limit = 1)[0]
-        author = str(adt.strong.contents[0].string)
-    else: # if it is a reply
-
-        adt = soup.findAll('p', 'vcard author', limit = 1)[0]
-        if len(adt.strong.contents) == 1:
-            author = str(adt.strong.contents[0].string)
-        else:
-            author = str(adt.strong.contents[1].string)
-    # above code exists as the vcard block for post and reply are different     adt = soup.findAll('p', 'vcard author', limit = 1)[0]
-    '''
     adt = soup.findAll('p', 'vcard author', limit = 1)[0]
     if len(adt.strong.contents) == 1:
         author = str(adt.strong.contents[0].string)
@@ -120,19 +112,14 @@ def getADT(soup): #soup is good reply
     return author, date, time
 
 def getID(soup):
-    global id_list
     idString = soup.findAll('div', 'post_body', limit = 1)[0].attrs[1][1]
     the_id = goodDigit(idString)
-    if the_id in id_list:
-        return -1
-    else:
-        id_list.append(the_id)
-        return the_id
-    
+    return the_id
+
 def getTitle(soup):
     """ only root_post could use this method"""
     title = soup.findAll('h1', 'title entry-title', limit = 1)[0].string
-    return goodString(title)
+    return fixup(goodString(title))
     
 
 atime = []
@@ -146,34 +133,34 @@ def add(parent_e, post_soup, level = 1):
         post_soup_e = SubElement(parent_e, "post")
         title = getTitle(post_soup)
         SubElement(post_soup_e, "title").text = title
-        the_id = getID(post_soup)
-        if the_id == -1: #in id list
-            return
-        SubElement(post_soup_e, "id").text = the_id
+        #the_id = getID(post_soup)
+        #if the_id == -1: #in id list
+        #    return
+        #SubElement(post_soup_e, "id").text = the_id
     
-        (author, date, post_time) = getADT(post_soup)
-        SubElement(post_soup_e, "author").text = author
-        SubElement(post_soup_e, "date").text = date
-        SubElement(post_soup_e, "time").text = post_time
-        content = getPostContent(post_soup)
-        SubElement(post_soup_e, "content").text = content
+        #(author, date, post_time) = getADT(post_soup)
+        #SubElement(post_soup_e, "author").text = author
+        #SubElement(post_soup_e, "date").text = date
+        #SubElement(post_soup_e, "time").text = post_time
+        #content = getPostContent(post_soup)
+        #SubElement(post_soup_e, "content").text = content
         #SubElement(post_soup_e, "char_count").text = str(len(content))
         #word_count = len(content.split(" "))
         #SubElement(post_soup_e, "word_count").text = str(word_count)
     else:
         post_soup_e = SubElement(parent_e, "reply")
     
-        the_id = getID(post_soup)
-        if the_id == -1: #in id list
-            return
-        SubElement(post_soup_e, "id").text = the_id
+    the_id = getID(post_soup)
+        #if the_id == -1: #in id list
+        #    return
+    SubElement(post_soup_e, "id").text = the_id
     
-        (author, date, post_time) = getADT(post_soup)
-        SubElement(post_soup_e, "author").text = author
-        SubElement(post_soup_e, "date").text = date
-        SubElement(post_soup_e, "time").text = post_time
-        content = getPostContent(post_soup)
-        SubElement(post_soup_e, "content").text = content
+    (author, date, post_time) = getADT(post_soup)
+    SubElement(post_soup_e, "author").text = author
+    SubElement(post_soup_e, "date").text = date
+    SubElement(post_soup_e, "time").text = post_time
+    content = getPostContent(post_soup)
+    SubElement(post_soup_e, "content").text = content
     SubElement(post_soup_e, "char_count").text = str(len(content))
     word_count = len(content.split(" "))
     SubElement(post_soup_e, "word_count").text = str(word_count)    
@@ -210,7 +197,6 @@ def add(parent_e, post_soup, level = 1):
     return
 
 rtime = [] #testing
-
 def haveReply(soup, num = 1): # only good_reply soup ok
     start = time.time() #testing
     replies_raw = [tag for tag in soup.findAll('li')]
@@ -222,15 +208,30 @@ def haveReply(soup, num = 1): # only good_reply soup ok
     end = time.time() #testing
     global rtime
     rtime.append(end - start)
-    if num ==1:
+    return len(replies), replies
+#old haveReply
+'''
+def haveReply(soup, num = 1): # only good_reply soup ok
+    start = time.time() #testing
+    replies_raw = [tag for tag in soup.findAll('li')]
+    replies = []   
+    for i in range(0, len(replies_raw)):
+        if replies_raw[i].ol != None:
+            replies.append(replies_raw[i])
+        
+    end = time.time() #testing
+    global rtime
+    rtime.append(end - start)
+    if num == 1:
         return len(replies)
     elif num == 0:
         return replies
     elif num == 2:
         return len(replies), replies
+'''
+#old haveReply
 
 def main():
-    global id_list
     urls=[]
     all_post_soup_list = []  
     
