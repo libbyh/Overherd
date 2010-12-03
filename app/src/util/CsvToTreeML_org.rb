@@ -4,6 +4,7 @@
 # Purpose: Creates a TreeML file from the forum CSVs.  A TreeML is an XML format for a tree data structure.
 #          This is necessary for the Prefuse toolkit.
 # Version 0.2 - fixed a few bugs and is now a bit faster
+# test my comment and NBGit
 
 require 'rubygems'
 require 'faster_csv'
