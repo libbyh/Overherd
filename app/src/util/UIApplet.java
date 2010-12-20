@@ -8,7 +8,7 @@ public class UIApplet extends JPrefuseApplet {
 
     public void init() {
         this.setContentPane(
-            new MainUI("http://www.kevinnam.com/overherd/data/forumTree.xml")
+            new MainUI()
             );
     }
     
