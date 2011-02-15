@@ -1,0 +1,32 @@
+Overherd Project
+
+Original Author: Kevin Nam (http://kevinnam.com)
+Contributors: Libby Hemphill, Ruoran Wang, Aalok Singhvi
+
+-----------------------------------------------------------------------------------
+Technical Architecture 
+-----------------------------------------------------------------------------------
+Application Server / Web Server    : NA
+Database Server	     		   : NA
+Application Framework and language : Java Swing
+
+Development Environment		   : Netbeans IDE 6.9 or higher ( JDK 1.6 or Higher)
+
+-----------------------------------------------------------------------------------
+Project Structure
+-----------------------------------------------------------------------------------
+/app
+contains files related to java project
+
+/importers
+contains files related to scripts used to import content from other sources
+
+/jars
+contains libraries Overherd requires
+
+If you want to build and run Overherd locally with your own data, you need only /app and /jars.
+
+If you want to run Overherd locally with your own data using an existing executable .jar, use
+/app/dist/Overherd.jar
+
+Usage: java -jar Overherd.jar INPUT_FILE
