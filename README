@@ -18,6 +18,9 @@ Project Structure
 /app
 contains files related to java project
 
+/dist
+files created by the IDE, contains compiled app Overherd.jar
+
 /importers
 contains files related to scripts used to import content from other sources
 
@@ -27,6 +30,6 @@ contains libraries Overherd requires
 If you want to build and run Overherd locally with your own data, you need only /app and /jars.
 
 If you want to run Overherd locally with your own data using an existing executable .jar, use
-/app/dist/Overherd.jar
+/dist/Overherd.jar
 
 Usage: java -jar Overherd.jar INPUT_FILE
