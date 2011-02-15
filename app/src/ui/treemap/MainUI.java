@@ -243,7 +243,7 @@ public class MainUI extends JPanel {
 		if (args.length==1){
 			inputFile=args[0];
 		}else{
-			System.err.println("Usage: java -jar overheard.jar INPUT_FILE");
+			System.err.println("Usage: java -jar Overherd.jar INPUT_FILE");
 			System.exit(0);
 		}
 

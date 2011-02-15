@@ -1,4 +1,7 @@
 #! /usr/bin/env python
+# chowhound.py - scrapes Chowhound discussion board to create XML
+# script requires Python 2.6
+
 import httplib2, time, re, htmlentitydefs
 from BeautifulSoup import BeautifulSoup
 from elementtree.ElementTree import Element, SubElement, ElementTree
@@ -236,7 +239,7 @@ def main():
     all_post_soup_list = []  
     
 
-    print "which board you want to scrap(input a number)?"
+    print "which board you want to scrape(input a number)?"
     board_number = unicode((raw_input()))
     url = u"http://chowhound.chow.com/boards/"
     url = url + board_number
