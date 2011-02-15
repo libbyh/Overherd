@@ -1,1 +1,9 @@
 forumTree6a.xml
+.DS_Store
+.cache
+build.xml
+manifest.mf
+nbproject/*
+app/dist/*
+build/*
+dist/*
