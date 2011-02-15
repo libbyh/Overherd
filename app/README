@@ -38,7 +38,30 @@ prefuse.jar
 
 All libraries are included in the /jars folder.
 
--- BUILDING --
+-- BUILDING IN NETBEANS 6.9.1 ON A MAC --
 
+Before opening NetBeans, make sure you have the most recent version of Overherd
+from the git repository. OVERHERD_PATH means the absolute path of where ever you
+keep your working copy of the Overherd project.
+
+1. Open NetBeans
+2. Select "New Project" from File menu
+3. Select "Java Project with Existing Sources" and click Next>
+4. Give the project a name, usually Overherd and select the folder where you keep
+your working copy as the Project Folder.
+5. Leave build.xml as the Build Script Name
+6. Choose Next>
+7. Choose OVERHERD_PATH/app/src as the Source Package Folder and click Next>
+8. Leave the Includes and Excludes as-is and click Finish
+9. Right click on "Overherd" in the Projects pane
+10. Choose Properties
+11. Choose Libraries
+12. Click "Add JAR/Folder"
+13. Add each .jar file from OVERHERD_PATH/jars individually
+14. Click OK
+15. Clean and Build the project
+
+Following those steps will create a local NetBeans project and produce a runnable
+Overherd.jar in the OVERHERD_PATH/dist folder.
 
 -- RUNNING --
