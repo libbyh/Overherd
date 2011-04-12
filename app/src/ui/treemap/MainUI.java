@@ -181,7 +181,7 @@ public class MainUI extends JPanel {
 		
 		controlPanel.add(cPanel, BorderLayout.CENTER);
 		
-		//select control
+		/* /select control
 		Box sBox=new Box(BoxLayout.Y_AXIS);
 		JScrollPane dScroll=new JScrollPane(sBox);
 		dScroll.setPreferredSize(new Dimension(130,200));
@@ -215,8 +215,9 @@ public class MainUI extends JPanel {
 			sBox.add(cB);
 		}
 		controlPanel.add(dScroll, BorderLayout.EAST);
+	    */	
 		
-		controlPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        controlPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		//UILib.setColor(controlPanel, Color.BLACK, Color.GRAY);
 		this.add(controlPanel, BorderLayout.SOUTH);
 		
